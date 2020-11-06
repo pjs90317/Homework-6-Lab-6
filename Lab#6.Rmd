@@ -1,0 +1,304 @@
+---
+title: "Lab 6"
+font-family: 'Corbel'
+author: Patrick Sinclair, Kieran Yuen
+output: github_document
+---
+```{r}
+setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
+load("acs2017_ny_data copy.RData")
+attach(acs2017_ny)
+```
+
+## Lab 6
+
+Anyway, on to the lab. This week we move to logit and probit models. These are suited for when the dependent y variable takes values of just 0 or 1.
+
+We will look at labor force participation, which is an important aspect of the economy -- who chooses to work (where those who are unemployed but looking for work are considered part of the labor force).
+
+
+The main differences from lm() are that the call now has a g in it, glm(), for Generalized Linear Model; and that it includes the bit about family = binomial.
+
+*Before you rush off to estimate that* just note that there is some preliminary work to be done (such as creating the data to use).
+
+```{r eval=FALSE}
+acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
+levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
+acs2017_ny$MARST <- as.factor(acs2017_ny$MARST)
+levels(acs2017_ny$MARST) <- c("married spouse present","married spouse absent","separated","divorced","widowed","never married")
+```
+What is the difference between "NA" as label and Not in the Labor Force? Make sure you understand. (Hint, look at ages in each group).
+NA - not able to participate in the labor force
+Not in LF - means they can participate in the labor force but they choose not to
+
+
+
+In general it is a good idea to check summary stats before doing fancier models. What fraction of people, say, 55-65, are in the labor force? What about other age ranges? What would you guess are other important predictors? For example,
+
+```{r eval=FALSE}
+workers <- (acs2017_ny$LABFORCE =="in LF")
+dat_workers <- subset(acs2017_ny,workers)
+```
+
+
+
+```{r eval=FALSE}
+acs2017_ny$age_bands <- cut(acs2017_ny$AGE,breaks=c(0,25,35,45,55,65,100))
+table(acs2017_ny$age_bands,acs2017_ny$LABFORCE)
+```
+(although kable package could do nicer, if you want to play)
+
+#Model: 25-35
+```{r eval=FALSE}
+pick_use1 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 35)
+dat_use1 <- subset(acs2017_ny, pick_use1)
+dat_use1$LABFORCE <- droplevels(dat_use1$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
+```
+
+
+```{r eval=FALSE}
+model_logit1 <- glm(LABFORCE ~ AGE + female + AfAm + Asian + race_oth + Hispanic 
+            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
+            + MARST,
+            family = binomial, data = dat_use1)
+summary(model_logit1)
+
+plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), data = dat_use1)
+
+logitpredict1 <- data.frame(AGE = 25:35)
+dat_use1$yhat <- predict(model_logit1, newdata = dat_use1)
+lines(yhat ~ AGE, data = dat_use1, col = "Black")
+legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
+max(dat_use1$yhat) 
+median(dat_use1$yhat)
+print(dat_use1$yhat)
+
+#graveyard <- (( >= 0) & (DEPARTS <= 459))
+#morning <- ((DEPARTS >= 500) & (DEPARTS <=930))
+#daytime <- ((DEPARTS >= 931) & (DEPARTS <=1700))
+#evening <- ((DEPARTS >= 1701) & (DEPARTS <=2359))
+#summary(graveyard)
+#summary(morning)
+#summary(daytime)
+#summary(evening)
+#table(morning)
+```
+
+
+#Model: 35-45
+```{r eval=FALSE}
+pick_use2 <- (acs2017_ny$AGE >35) & (acs2017_ny$AGE <= 45)
+dat_use2 <- subset(acs2017_ny, pick_use2)
+dat_use2$LABFORCE <- droplevels(dat_use2$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
+```
+
+
+```{r eval=FALSE}
+model_logit2 <- glm(LABFORCE ~ AGE  + female + AfAm + Asian + race_oth + Hispanic 
+            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
+            + MARST,
+            family = binomial, data = dat_use2)
+summary(model_logit2)
+
+plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use2)
+logitpredict1 <- data.frame(AGE = 35:45)
+dat_use2$yhat <- predict(model_logit2, newdata = dat_use2)
+lines(yhat ~ AGE, data = dat_use2, col = "Black")
+#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
+max(dat_use2$yhat) 
+median(dat_use2$yhat)
+```
+
+
+
+#Model: 45-55
+```{r eval=FALSE}
+pick_use3 <- (acs2017_ny$AGE >45) & (acs2017_ny$AGE <= 55)
+dat_use3 <- subset(acs2017_ny, pick_use3)
+dat_use3$LABFORCE <- droplevels(dat_use3$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
+```
+
+
+```{r eval=FALSE}
+model_logit3 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
+            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
+            + MARST,
+            family = binomial, data = dat_use3)
+summary(model_logit3)
+
+plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use3)
+logitpredict1 <- data.frame(AGE = 45:55)
+dat_use3$yhat <- predict(model_logit3, newdata = dat_use3)
+lines(yhat ~ AGE, data = dat_use3, col = "Black")
+#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
+max(dat_use3$yhat) 
+median(dat_use3$yhat)
+```
+
+#Model: 55-65
+```{r eval=FALSE}
+pick_use4 <- (acs2017_ny$AGE >55) & (acs2017_ny$AGE <= 65)
+dat_use4 <- subset(acs2017_ny, pick_use4)
+dat_use4$LABFORCE <- droplevels(dat_use4$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
+```
+
+
+```{r eval=FALSE}
+model_logit4 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
+            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
+            + MARST,
+            family = binomial, data = dat_use4)
+summary(model_logit4)
+
+plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use4)
+logitpredict1 <- data.frame(AGE = 55:65)
+dat_use4$yhat <- predict(model_logit4, newdata = dat_use4)
+lines(yhat ~ AGE, data = dat_use4, col = "Black")
+#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
+max(dat_use4$yhat) 
+median(dat_use4$yhat)
+```
+
+
+
+
+#Model: 25-65
+```{r eval=FALSE}
+pick_use5 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 65)
+dat_use5 <- subset(acs2017_ny, pick_use5)
+dat_use5$LABFORCE <- droplevels(dat_use5$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
+```
+
+
+```{r eval=FALSE}
+model_logit5 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
+            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
+            + MARST,
+            family = binomial, data = dat_use5)
+summary(model_logit5)
+
+plot(LABFORCE ~ jitter(AGE, factor = 5), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use5)
+logitpredict1 <- data.frame(AGE = 25:65)
+dat_use5$yhat <- predict(model_logit5, newdata = dat_use5)
+lines(yhat ~ AGE, data = dat_use5, col = "Black")
+#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
+max(dat_use5$yhat) #peak predicted wage for Mid 
+```
+
+
+
+#Model: 65-85
+```{r eval=FALSE}
+pick_use6 <- (acs2017_ny$AGE >65) & (acs2017_ny$AGE <= 85)
+dat_use6 <- subset(acs2017_ny, pick_use6)
+dat_use6$LABFORCE <- droplevels(dat_use6$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
+```
+
+
+```{r eval=FALSE}
+model_logit6 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
+            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
+            + MARST,
+            family = binomial, data = dat_use6)
+summary(model_logit6)
+
+plot(LABFORCE ~ jitter(AGE, factor = 0.5), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use6)
+logitpredict1 <- data.frame(AGE = 65:85)
+dat_use6$yhat <- predict(model_logit6, newdata = dat_use6)
+lines(yhat ~ AGE, data = dat_use6, col = "Black")
+#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
+max(dat_use6$yhat) #peak predicted wage for Mid 
+```
+
+
+
+
+
+
+
+
+#Start of Kieran's work
+What other X variables might you add? Maybe some interactions? LOTS OF INTERACTIONS? What other subsets? What changes about results with different subsets?
+
+
+```{r eval=FALSE}
+pick_use3 <- (acs2017_ny$AGE >45) & (acs2017_ny$AGE <= 55)
+dat_use3 <- subset(acs2017_ny, pick_use3)
+dat_use3$LABFORCE <- droplevels(dat_use3$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
+```
+
+Baseline model,
+```{r eval=FALSE}
+model_logit3 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
+            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
+            + MARST,
+            family = binomial, data = dat_use3)
+summary(model_logit3)
+```
+
+
+For homework, I will ask for predicted values so you can start to figure out how to get those.
+
+Do the X variables have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
+
+
+#Start of Logit Models
+
+Also estimate a probit model (details in Lecture Notes) and OLS, with the same X and Y variables. Compare the results, such as coefficients and predicted values. If you're eager, try to split the sample into training and test data, then compare which model predicts better in the sample that it hasn't seen yet.
+
+Logit models are very very commonly used in many models. But on the other hand there are people that say it says too much. Sometimes bland "OLS" might be better
+
+```{r eval=FALSE}
+#How do OLS and logit compare?
+
+#OLS is just creating a line. 
+
+#Our y variable can only be equal to 0 or 1, this can possibly be a problem for some situations.
+
+#With a logit, it is strained to produce a value between 0 and 1.
+
+#difference between logit and probit? Usually very minor.....
+
+#think of it that "not one model is right," think of it that we need to use all these models. To what extent am i confident on using these as a basis for a prediction?
+
+#I can use a logit, probit and OLS model. And then amalgamate all three together
+
+#it depends on the range of your x variables
+
+#greater than 1 means there are probably other factors
+
+#generally, we can easily interpret the sign of a coefficient, but the actual number of the coefficient is not easily interpreted as many 
+
+#what should we do with dropped variables? It has to drop to one variable, so that people who are 
+
+#the amount people spend on their utility is probably gonna be related to their income
+#if i make a lot of money, i might move somewhere that is nicer that probably will have higher utility costs
+
+#logit case - the Y can only take two possible answers: is the person in the labor force or not? Does someone have health insurance? We cannot do this with marital status because someone would be unmarried now but they were married once before.
+
+#How do people choose, what type of commute they use to work?
+#Logit: did people take public transportation or not?
+#subdivide: if it is public transit, what form of public transit?
+#COVID-19: Did the person work from home or not?
+```
+
+
+## Appendix
+
+To clear up some of the definitions,
+```{r eval=FALSE}
+acs2017_ny$EMPSTAT <- as.factor(acs2017_ny$EMPSTAT)
+levels(acs2017_ny$EMPSTAT) <- c("NA","Employed","Unemployed","Not in LF")
+acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
+levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
+acs2017_ny$CLASSWKR <- as.factor(acs2017_ny$CLASSWKR)
+levels(acs2017_ny$CLASSWKR) <- c("NA","self employed","work for wages")
+acs2017_ny$WKSWORK2 <- as.factor(acs2017_ny$WKSWORK2)
+levels(acs2017_ny$WKSWORK2) <- c("NA","1-13 wks","14-26 wks","27-39 wks","40-47 wks","48-49 wks","50-52 wks")
+# although note that making this a factor breaks some earlier code where we used (WKSWORK2 > 4) so you might not want to run that code or else change to WKSWORK2_factor <- as.factor(WKSWORK2). Which is arguably better for various other reasons.
+# these help clarify how these definitions work together
+table(acs2017_ny$EMPSTAT,acs2017_ny$LABFORCE)
+table(acs2017_ny$EMPSTAT,acs2017_ny$CLASSWKR)
+```
+
+
