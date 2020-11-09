@@ -8,6 +8,7 @@ output: github_document
 setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
 load("acs2017_ny_data copy.RData")
 attach(acs2017_ny)
+detach()
 ```
 
 ## Lab 6
@@ -43,14 +44,14 @@ dat_workers <- subset(acs2017_ny,workers)
 
 
 ```{r eval=FALSE}
-acs2017_ny$age_bands <- cut(acs2017_ny$AGE,breaks=c(0,25,35,45,55,65,100))
+acs2017_ny$age_bands <- cut(acs2017_ny$AGE,breaks=c(0,15, 25,35,45,55,65,100))
 table(acs2017_ny$age_bands,acs2017_ny$LABFORCE)
 ```
 (although kable package could do nicer, if you want to play)
 
-#Model: 25-35
+# Model: 25-55
 ```{r eval=FALSE}
-pick_use1 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 35)
+pick_use1 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 55)
 dat_use1 <- subset(acs2017_ny, pick_use1)
 dat_use1$LABFORCE <- droplevels(dat_use1$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
 ```
@@ -65,14 +66,118 @@ summary(model_logit1)
 
 plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), data = dat_use1)
 
-logitpredict1 <- data.frame(AGE = 25:35)
-dat_use1$yhat <- predict(model_logit1, newdata = dat_use1)
-lines(yhat ~ AGE, data = dat_use1, col = "Black")
-legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
-max(dat_use1$yhat) 
-median(dat_use1$yhat)
-print(dat_use1$yhat)
+#logitpredict1 <- data.frame(AGE = 25:35)
+#dat_use1$yhat <- predict(model_logit1, newdata = dat_use1)
+#lines(yhat ~ AGE, data = dat_use1, col = "Black")
+#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
+#max(dat_use1$yhat) 
+#median(dat_use1$yhat)
+#print(dat_use1$yhat)
 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Start of Kieran's work
+What other X variables might you add? Maybe some interactions? LOTS OF INTERACTIONS? What other subsets? What changes about results with different subsets?
+
+We would like to use FAMSIZE to see how family size affects a person's probabilities of being in the labor force. We decided to break up the family size column into three groups (# of family members): small (0-3), medium (4-6), large (7-29). 
+
+Let's first take a bird's eye view of the acs2017 data to see how many of our three Family size groups are in the Labor Force.
+
+Results: Looking at the overview table of our data we can see that a majority of people of all ages and family sizes participate in the labor force. This is to be expected as most people do need to make a living and bring in income to survive. But we see there is also a good proportion of those who are not in the labor force, which allows us to be able to do a regression analysis on the difference.
+```{r eval=FALSE}
+acs2017_ny$SizeofFam <- cut(acs2017_ny$FAMSIZE,breaks=c(0,3,6,29))
+table(acs2017_ny$LABFORCE,acs2017_ny$age_bands,acs2017_ny$SizeofFam)
+```
+
+
+Next, let's make separate columns in the acs2017 data for each of the three (3) family sizes similar to how there are five (5) columns for education (educ_nohs, educ_hs, etc....).
+```{r eval=FALSE}
+acs2017_ny$SmallFamily <- ((acs2017_ny$FAMSIZE >= 0) & (acs2017_ny$FAMSIZE <= 3))
+acs2017_ny$MediumFamily <- ((acs2017_ny$FAMSIZE >= 4) & (acs2017_ny$FAMSIZE <= 6))
+acs2017_ny$LargeFamily <- ((acs2017_ny$FAMSIZE >= 7) & (acs2017_ny$FAMSIZE <= 29))
+```
+
+# Logit: Fam Size ONLY
+Next, let's run the logit regression to see how the family sizes affect whether someone is in the labor force or not. 
+
+Expectation: We are expecting that one of the three (3) variables will drop off as that is necessary so that the variables can be compared to something. also, we were thinking that the larger the size of the family the less likely the labor participation rate would be, but the counter to that is that those larger families have more mouths to feed and thus would increase their likelihood to be in the labor force. So it is hard to estimate which of the three (3) family sizes will show to have the largest effect on labor participation rates.
+
+Result: So it appears that *medium* families have the highest probability of being in the labor force. Next would be *small* families and last is *large* families which have the lowest probabilities of being in the labor force.
+```{r eval=FALSE}
+model_logit2 <- glm(LABFORCE ~ SmallFamily + MediumFamily + LargeFamily,
+            family = binomial, data = dat_use1)
+summary(model_logit2)
+
+model_logit3 <- glm(LABFORCE ~  MediumFamily + LargeFamily + SmallFamily,
+            family = binomial, data = dat_use1)
+summary(model_logit3)
+
+model_logit4 <- glm(LABFORCE ~  LargeFamily + SmallFamily + MediumFamily,
+            family = binomial, data = dat_use1)
+summary(model_logit4)
+```
+
+# Logit: All Variables
+Next, let's add in all the other variables to see how that affects our probabilities.
+
+Result: Medium families show the highest probability. Followed by small families. Last is large families. All three family sizes are statistically significant at the 0.05 level.
+```{r eval=FALSE}
+model_logit5 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily,
+            family = binomial, data = dat_use1)
+summary(model_logit5)
+
+model_logit6 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily,
+            family = binomial, data = dat_use1)
+summary(model_logit6)
+
+model_logit7 <- glm(LABFORCE ~ AGE + female + LargeFamily + SmallFamily + MediumFamily,
+            family = binomial, data = dat_use1)
+summary(model_logit7)
+```
+
+# Logit: All Variables (Interactions)
+```{r eval=FALSE}
+model_logit8 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) + I(female*AGE),
+            family = binomial, data = dat_use1)
+summary(model_logit8)
+tab_model(model_logit8, p.style = "numeric_stars", transform = NULL)
+plot_model(model_logit8)+theme_blank()
+
+model_logit9 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) + I(female*AGE),
+            family = binomial, data = dat_use1)
+summary(model_logit9)
+
+model_logit10 <- glm(LABFORCE ~ AGE + female + LargeFamily + SmallFamily + MediumFamily + I(LargeFamily*AGE) + I(SmallFamily*AGE) + I(MediumFamily*AGE),
+            family = binomial, data = dat_use1)
+summary(model_logit10)
+```
+
+How do we do the zero-to-one plots?
+
+```{r eval=FALSE}
 #graveyard <- (( >= 0) & (DEPARTS <= 459))
 #morning <- ((DEPARTS >= 500) & (DEPARTS <=930))
 #daytime <- ((DEPARTS >= 931) & (DEPARTS <=1700))
@@ -85,169 +190,20 @@ print(dat_use1$yhat)
 ```
 
 
-#Model: 35-45
-```{r eval=FALSE}
-pick_use2 <- (acs2017_ny$AGE >35) & (acs2017_ny$AGE <= 45)
-dat_use2 <- subset(acs2017_ny, pick_use2)
-dat_use2$LABFORCE <- droplevels(dat_use2$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
-```
 
 
-```{r eval=FALSE}
-model_logit2 <- glm(LABFORCE ~ AGE  + female + AfAm + Asian + race_oth + Hispanic 
-            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
-            + MARST,
-            family = binomial, data = dat_use2)
-summary(model_logit2)
+# For homework, I will ask for predicted values so you can start to figure out how to get those.
 
-plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use2)
-logitpredict1 <- data.frame(AGE = 35:45)
-dat_use2$yhat <- predict(model_logit2, newdata = dat_use2)
-lines(yhat ~ AGE, data = dat_use2, col = "Black")
-#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
-max(dat_use2$yhat) 
-median(dat_use2$yhat)
-```
+# Do the X variables have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
 
 
-
-#Model: 45-55
-```{r eval=FALSE}
-pick_use3 <- (acs2017_ny$AGE >45) & (acs2017_ny$AGE <= 55)
-dat_use3 <- subset(acs2017_ny, pick_use3)
-dat_use3$LABFORCE <- droplevels(dat_use3$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
-```
-
-
-```{r eval=FALSE}
-model_logit3 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
-            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
-            + MARST,
-            family = binomial, data = dat_use3)
-summary(model_logit3)
-
-plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use3)
-logitpredict1 <- data.frame(AGE = 45:55)
-dat_use3$yhat <- predict(model_logit3, newdata = dat_use3)
-lines(yhat ~ AGE, data = dat_use3, col = "Black")
-#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
-max(dat_use3$yhat) 
-median(dat_use3$yhat)
-```
-
-#Model: 55-65
-```{r eval=FALSE}
-pick_use4 <- (acs2017_ny$AGE >55) & (acs2017_ny$AGE <= 65)
-dat_use4 <- subset(acs2017_ny, pick_use4)
-dat_use4$LABFORCE <- droplevels(dat_use4$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
-```
-
-
-```{r eval=FALSE}
-model_logit4 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
-            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
-            + MARST,
-            family = binomial, data = dat_use4)
-summary(model_logit4)
-
-plot(LABFORCE ~ jitter(AGE, factor = 1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use4)
-logitpredict1 <- data.frame(AGE = 55:65)
-dat_use4$yhat <- predict(model_logit4, newdata = dat_use4)
-lines(yhat ~ AGE, data = dat_use4, col = "Black")
-#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
-max(dat_use4$yhat) 
-median(dat_use4$yhat)
-```
-
-
-
-
-#Model: 25-65
-```{r eval=FALSE}
-pick_use5 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 65)
-dat_use5 <- subset(acs2017_ny, pick_use5)
-dat_use5$LABFORCE <- droplevels(dat_use5$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
-```
-
-
-```{r eval=FALSE}
-model_logit5 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
-            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
-            + MARST,
-            family = binomial, data = dat_use5)
-summary(model_logit5)
-
-plot(LABFORCE ~ jitter(AGE, factor = 5), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use5)
-logitpredict1 <- data.frame(AGE = 25:65)
-dat_use5$yhat <- predict(model_logit5, newdata = dat_use5)
-lines(yhat ~ AGE, data = dat_use5, col = "Black")
-#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
-max(dat_use5$yhat) #peak predicted wage for Mid 
-```
-
-
-
-#Model: 65-85
-```{r eval=FALSE}
-pick_use6 <- (acs2017_ny$AGE >65) & (acs2017_ny$AGE <= 85)
-dat_use6 <- subset(acs2017_ny, pick_use6)
-dat_use6$LABFORCE <- droplevels(dat_use6$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
-```
-
-
-```{r eval=FALSE}
-model_logit6 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
-            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
-            + MARST,
-            family = binomial, data = dat_use6)
-summary(model_logit6)
-
-plot(LABFORCE ~ jitter(AGE, factor = 0.5), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,300000), data = dat_use6)
-logitpredict1 <- data.frame(AGE = 65:85)
-dat_use6$yhat <- predict(model_logit6, newdata = dat_use6)
-lines(yhat ~ AGE, data = dat_use6, col = "Black")
-#legend("topleft", c("Mid"), lty = 1, col=c("Black"), bty = "n")
-max(dat_use6$yhat) #peak predicted wage for Mid 
-```
-
-
-
-
-
-
-
-
-#Start of Kieran's work
-What other X variables might you add? Maybe some interactions? LOTS OF INTERACTIONS? What other subsets? What changes about results with different subsets?
-
-
-```{r eval=FALSE}
-pick_use3 <- (acs2017_ny$AGE >45) & (acs2017_ny$AGE <= 55)
-dat_use3 <- subset(acs2017_ny, pick_use3)
-dat_use3$LABFORCE <- droplevels(dat_use3$LABFORCE) # actually not necessary since logit is smart enough to drop unused levels, but helps my personal sense of order
-```
-
-Baseline model,
-```{r eval=FALSE}
-model_logit3 <- glm(LABFORCE ~ AGE + I(AGE^2) + female + AfAm + Asian + race_oth + Hispanic 
-            + educ_hs + educ_somecoll + educ_college + educ_advdeg 
-            + MARST,
-            family = binomial, data = dat_use3)
-summary(model_logit3)
-```
-
-
-For homework, I will ask for predicted values so you can start to figure out how to get those.
-
-Do the X variables have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
-
-
-#Start of Logit Models
+# Start of Probit Models
 
 Also estimate a probit model (details in Lecture Notes) and OLS, with the same X and Y variables. Compare the results, such as coefficients and predicted values. If you're eager, try to split the sample into training and test data, then compare which model predicts better in the sample that it hasn't seen yet.
 
 Logit models are very very commonly used in many models. But on the other hand there are people that say it says too much. Sometimes bland "OLS" might be better
 
+# Notes
 ```{r eval=FALSE}
 #How do OLS and logit compare?
 
