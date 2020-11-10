@@ -231,7 +231,42 @@ variables.
 Result: The interactions of family size and being female appear to be
 negative. This is telling us that being female negative impacts the
 probabilities of being in the labor force whatever the person’s family
-size maybe.
+size. Similarly, women’s probability of participation in the labor force
+only changes 0.009% with every year increase in age.
+
+    ## 
+    ## Call:
+    ## glm(formula = LABFORCE ~ AGE + female + MediumFamily + LargeFamily + 
+    ##     SmallFamily + I(MediumFamily * female) + I(LargeFamily * 
+    ##     female) + I(SmallFamily * female) + I(female * AGE), family = binomial, 
+    ##     data = dat_use1)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -2.3092   0.4127   0.5094   0.7096   1.0132  
+    ## 
+    ## Coefficients:
+    ##                            Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)               1.2379564  0.0726666  17.036  < 2e-16 ***
+    ## AGE                      -0.0124146  0.0017113  -7.254 4.04e-13 ***
+    ## female                    0.4936177  0.0978378   5.045 4.53e-07 ***
+    ## MediumFamilyTRUE          1.6790857  0.0404093  41.552  < 2e-16 ***
+    ## LargeFamilyTRUE           1.2666258  0.0911349  13.898  < 2e-16 ***
+    ## SmallFamilyTRUE           1.3966952  0.0359585  38.842  < 2e-16 ***
+    ## I(MediumFamily * female) -1.7981617  0.0545846 -32.943  < 2e-16 ***
+    ## I(LargeFamily * female)  -1.8633964  0.1115125 -16.710  < 2e-16 ***
+    ## I(SmallFamily * female)  -0.9986488  0.0518064 -19.277  < 2e-16 ***
+    ## I(female * AGE)          -0.0009579  0.0022252  -0.430    0.667    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 71408  on 74934  degrees of freedom
+    ## Residual deviance: 67895  on 74925  degrees of freedom
+    ## AIC: 67915
+    ## 
+    ## Number of Fisher Scoring iterations: 5
 
 How do we do the zero-to-one plots?
 

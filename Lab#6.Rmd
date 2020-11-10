@@ -121,9 +121,9 @@ summary(model_logit3)
 
 # Logit: All Variables (Interactions)
 
-Result: The interactions of family size and being female appear to be negative. This is telling us that being female negative impacts the probabilities of being in the labor force whatever the person's family size maybe.
-```{r eval=FALSE}
-model_logit4 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + Individual + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) +I(Individual*female)  + I(female*AGE),
+Result: The interactions of family size and being female appear to be negative. This is telling us that being female negative impacts the probabilities of being in the labor force whatever the person's family size. Similarly, women's probability of participation in the labor force only changes 0.009% with every year increase in age.
+```{r}
+model_logit4 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) + I(female*AGE),
             family = binomial, data = dat_use1)
 summary(model_logit4)
 ```
