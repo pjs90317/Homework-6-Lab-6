@@ -7,8 +7,8 @@ output: github_document
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-setwd("C:/Users/psin7/Documents/CCNY/Econometrics/Homework/Draft Hwk Files")
-load("acs2017_ny_data.RData")
+setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
+load("acs2017_ny_data copy.RData")
 attach(acs2017_ny)
 detach()
 ```
@@ -87,7 +87,7 @@ Next, let's make separate columns in the acs2017 data for each of the three (3) 
 
 (Note: we have created an extra "Individual" column so that that can serve as the "dropped variable" when we are running our logit regressions)
 ```{r eval=FALSE}
-acs2017_ny$Individual <- ((acs2017_ny$FAMSIZE >= 0) & (acs2017_ny$FAMSIZE <= 1))
+acs2017_ny$Individual <- ((acs2017_ny$FAMSIZE >= 1) & (acs2017_ny$FAMSIZE <= 1))
 acs2017_ny$SmallFamily <- ((acs2017_ny$FAMSIZE >= 2) & (acs2017_ny$FAMSIZE <= 3))
 acs2017_ny$MediumFamily <- ((acs2017_ny$FAMSIZE >= 4) & (acs2017_ny$FAMSIZE <= 6))
 acs2017_ny$LargeFamily <- ((acs2017_ny$FAMSIZE >= 7) & (acs2017_ny$FAMSIZE <= 29))
@@ -96,7 +96,7 @@ summary(acs2017_ny$SmallFamily)
 summary(acs2017_ny$MediumFamily) 
 summary(acs2017_ny$LargeFamily)
 
-dat_use1$Individual <- ((dat_use1$FAMSIZE >= 0) & (dat_use1$FAMSIZE <= 1))
+dat_use1$Individual <- ((dat_use1$FAMSIZE >= 1) & (dat_use1$FAMSIZE <= 1))
 dat_use1$SmallFamily <- ((dat_use1$FAMSIZE >= 2) & (dat_use1$FAMSIZE <= 3))
 dat_use1$MediumFamily <- ((dat_use1$FAMSIZE >= 4) & (dat_use1$FAMSIZE <= 6))
 dat_use1$LargeFamily <- ((dat_use1$FAMSIZE >= 7) & (dat_use1$FAMSIZE <= 29))
