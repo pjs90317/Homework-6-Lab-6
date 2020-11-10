@@ -141,30 +141,6 @@ three (3) family sizes similar to the (5) columns for education
 serve as the “dropped variable” when we are running our logit
 regressions)
 
-    ##    Mode   FALSE    TRUE 
-    ## logical  157253   39332
-
-    ##    Mode   FALSE    TRUE 
-    ## logical  113117   83468
-
-    ##    Mode   FALSE    TRUE 
-    ## logical  131055   65530
-
-    ##    Mode   FALSE    TRUE 
-    ## logical  188330    8255
-
-    ##    Mode   FALSE    TRUE 
-    ## logical   61205   13730
-
-    ##    Mode   FALSE    TRUE 
-    ## logical   43026   31909
-
-    ##    Mode   FALSE    TRUE 
-    ## logical   48269   26666
-
-    ##    Mode   FALSE    TRUE 
-    ## logical   72305    2630
-
 # Logit: Fam Size ONLY
 
 Next, let’s run the logit regression to see how the family sizes affect
@@ -197,12 +173,12 @@ of these coefficients used an Individual as the basis for comparison.
     ## -1.9753   0.5538   0.5538   0.6198   0.8184  
     ## 
     ## Coefficients: (1 not defined because of singularities)
-    ##                  Estimate Std. Error z value Pr(>|z|)    
-    ## (Intercept)       0.92196    0.01891  48.744  < 2e-16 ***
-    ## SmallFamilyTRUE   0.87555    0.02479  35.313  < 2e-16 ***
-    ## MediumFamilyTRUE  0.63034    0.02486  25.360  < 2e-16 ***
-    ## LargeFamilyTRUE   0.21660    0.04927   4.397  1.1e-05 ***
-    ## IndividualTRUE         NA         NA      NA       NA    
+    ##              Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)   0.92196    0.01891  48.744  < 2e-16 ***
+    ## SmallFamily   0.87555    0.02479  35.313  < 2e-16 ***
+    ## MediumFamily  0.63034    0.02486  25.360  < 2e-16 ***
+    ## LargeFamily   0.21660    0.04927   4.397  1.1e-05 ***
+    ## Individual         NA         NA      NA       NA    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -226,13 +202,42 @@ families. All three family sizes are statistically significant at the
 the probabilities of labor force participation of the three family
 variables.
 
+    ## 
+    ## Call:
+    ## glm(formula = LABFORCE ~ AGE + female + SmallFamily + MediumFamily + 
+    ##     LargeFamily + Individual, family = binomial, data = dat_use1)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -2.1975   0.4583   0.5657   0.6684   1.0018  
+    ## 
+    ## Coefficients: (1 not defined because of singularities)
+    ##               Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)   1.659558   0.048556  34.178  < 2e-16 ***
+    ## AGE          -0.012036   0.001084 -11.108  < 2e-16 ***
+    ## female       -0.569325   0.019672 -28.941  < 2e-16 ***
+    ## SmallFamily   0.974176   0.025270  38.551  < 2e-16 ***
+    ## MediumFamily  0.716009   0.025245  28.362  < 2e-16 ***
+    ## LargeFamily   0.280068   0.049725   5.632 1.78e-08 ***
+    ## Individual          NA         NA      NA       NA    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 71408  on 74934  degrees of freedom
+    ## Residual deviance: 69135  on 74929  degrees of freedom
+    ## AIC: 69147
+    ## 
+    ## Number of Fisher Scoring iterations: 4
+
 # Logit: All Variables (Interactions)
 
 Result: The interactions of family size and being female appear to be
 negative. This is telling us that being female negative impacts the
 probabilities of being in the labor force whatever the person’s family
 size. Similarly, women’s probability of participation in the labor force
-only changes 0.009% with every year increase in age.
+only changes 0.09% with every year increase in age.
 
     ## 
     ## Call:
@@ -250,9 +255,9 @@ only changes 0.009% with every year increase in age.
     ## (Intercept)               1.2379564  0.0726666  17.036  < 2e-16 ***
     ## AGE                      -0.0124146  0.0017113  -7.254 4.04e-13 ***
     ## female                    0.4936177  0.0978378   5.045 4.53e-07 ***
-    ## MediumFamilyTRUE          1.6790857  0.0404093  41.552  < 2e-16 ***
-    ## LargeFamilyTRUE           1.2666258  0.0911349  13.898  < 2e-16 ***
-    ## SmallFamilyTRUE           1.3966952  0.0359585  38.842  < 2e-16 ***
+    ## MediumFamily              1.6790857  0.0404093  41.552  < 2e-16 ***
+    ## LargeFamily               1.2666258  0.0911349  13.898  < 2e-16 ***
+    ## SmallFamily               1.3966952  0.0359585  38.842  < 2e-16 ***
     ## I(MediumFamily * female) -1.7981617  0.0545846 -32.943  < 2e-16 ***
     ## I(LargeFamily * female)  -1.8633964  0.1115125 -16.710  < 2e-16 ***
     ## I(SmallFamily * female)  -0.9986488  0.0518064 -19.277  < 2e-16 ***
@@ -267,6 +272,38 @@ only changes 0.009% with every year increase in age.
     ## AIC: 67915
     ## 
     ## Number of Fisher Scoring iterations: 5
+
+![](Lab-6_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+    ## 
+    ## 0.860779455857246 0.862260546681493 0.863728375437847 0.865183007862796 
+    ##              2950              2999              2944              2907 
+    ## 0.866624510531691 0.868052950828762  0.86946839691749 0.870870917711318 
+    ##              2606              2748              2414              2532 
+    ## 0.872260582844717 0.873637462644618 0.875001628102205 0.876353150845078 
+    ##              2548              2505              2466              2151 
+    ## 0.877692103109785  0.87901855771474 0.880332588033515 0.881634267968514 
+    ##              2067              2289              2229              2510 
+    ##  0.88292367192504 0.884200874785746 0.885465951885478  0.88671897898651 
+    ##              2321              2271              2358              2326 
+    ## 0.887960032254177 0.889189188232896 0.890406523822594 0.891612116255524 
+    ##              2552              2372              2315              2449 
+    ## 0.892806043073481 0.893988382105424 0.895159211445482 0.896318609431368 
+    ##              2455              2623              2494              2504 
+    ## 0.897466654623188 0.898603425782644 
+    ##              2560              2470
+
+    ##        true
+    ## pred    Not in LF in LF
+    ##   FALSE      7006 29120
+    ##   TRUE       6735 32074
+
+    ##        true
+    ## pred     Not in LF      in LF
+    ##   FALSE 0.09349436 0.38860346
+    ##   TRUE  0.08987789 0.42802429
+
+    ## [1] 0.5215186
 
 How do we do the zero-to-one plots?
 
@@ -291,3 +328,12 @@ other hand there are people that say it says too much. Sometimes bland
 ## Appendix
 
 To clear up some of the definitions,
+
+### Bibliography
+
+Accessed: 11/09/2020
+<https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder>
+
+<https://www.bls.gov/cps/definitions.htm#laborforce>
+
+<https://usa.ipums.org/usa-action/variables/FAMSIZE#description_section>
