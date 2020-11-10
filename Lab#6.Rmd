@@ -7,8 +7,8 @@ output: github_document
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-setwd("~/CCNY/Econometrics/Homework/Draft Hwk Files")
-load("acs2017_ny_data.RData")
+setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
+load("acs2017_ny_data copy.RData")
 attach(acs2017_ny)
 detach()
 ```
@@ -171,8 +171,8 @@ detach()
 
 
 
-# Probit: All Variables
-Result: The Probit estimation also shows small familes with the highest probabilities to being in the labor force, which is similar to the logit models, albeit with a smaller probability than logit. The medium-size and large-size families follow just like in the logit models.
+### Probit: All Variables
+Result: The Probit estimation also shows small familes with the highest probabilities to being in the labor force, which is similar to the logit models, albeit with a smaller probability than logit. The medium-size and large-size families follow just like in the logit models. Also, we were looking at the plot and were curious if these percentages of "in labor force" vs "not in labor force" weer indeed correct. We were able to confirm through the [Bureau of Labor Statistics (BLS) website](https://www.bls.gov/emp/tables/civilian-labor-force-participation-rate.htm) that the proportions were indeed correct.
 ![Probit](./probit.png)
 ```{r}
 model_probit1 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
@@ -194,7 +194,7 @@ predacc3
 detach()
 ```
 
-# Probit: All Variables (Interactions)
+### Probit: All Variables (Interactions)
 Result: The resulting probit regression on the same X and Y variables (along with the same interactions) are very similar to logit model where we see all the interactions between female and all three sizes of family have a negative probability but the probability is not as pronounced in the profit model as in the logit model.
 ```{r}
 model_probit2 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) + I(female*AGE),
@@ -216,7 +216,7 @@ predacc4
 detach()
 ```
 
-# Comparing all the predictions
+### Comparing all the predictions
 Result: Comparing the logit and the probit where we used *All Variables* we can see that both the logit and probit models predicted accurately ~60% of the time. And for the *All Variables (Interaction)* we can see that both models predicted ~51%. In the end, we are able to see what we learned from the lecture notes: that probit and logit are approximately the same; the differences are rather small.
 ```{r}
 #Logit: All Variables
@@ -246,16 +246,62 @@ detach()
 ```{r}
 png(filename="./olsplot.png")
 plot(LABFORCEa ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0.75,1.25), data = predols)
-olspredict <- data.frame(AGE = 25:55, female = 1, SmallFamily = 0, LargeFamily = 1, MediumFamily = 0)
+olspredict <- data.frame(AGE = 25:55, female = 0, SmallFamily = 0, LargeFamily = 1, MediumFamily = 0)
 olspredict$yhat <- predict(olslabforce, newdata = olspredict)
 lines(yhat ~ AGE, data = olspredict)
 dev.off()
 ```
 ![OLS Plot](./olsplot.png)  
 
+### Comparison: new subset
+Lastly, we wanted to see how changing the subset would change our logit and probit models.
+
+Expectation: We had assumed with the higher level of poverty, we would see overall reduced probability of participating in the labor force
+
+Result: After running the logit regresison on the new subset, what we are actually seeing is that people in larger families are having to contribute more, which is the opposite of the rest of the datasets we ran above.
+```{r}
+BoogieDown <- subset(acs2017_ny,(PUMA >= 3701) & (PUMA <= 3710))
+
+BoogieDown$Individual <- as.numeric((BoogieDown$FAMSIZE >= 1) & (BoogieDown$FAMSIZE <= 1))
+BoogieDown$SmallFamily <- as.numeric((BoogieDown$FAMSIZE >= 2) & (BoogieDown$FAMSIZE <= 3))
+BoogieDown$MediumFamily <- as.numeric((BoogieDown$FAMSIZE >= 4) & (BoogieDown$FAMSIZE <= 6))
+BoogieDown$LargeFamily <- as.numeric((BoogieDown$FAMSIZE >= 7) & (BoogieDown$FAMSIZE <= 29))
+
+BoogieDown$LABFORCE <- droplevels(BoogieDown$LABFORCE) 
+
+model_BoogieDown <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
+            family = binomial, data = BoogieDown)
+summary(model_BoogieDown)
+
+
+#Predictions - Logit: All Variables
+attach(BoogieDown)
+NNobs <- length(BoogieDown$LABFORCE)
+set.seed(12345)
+graph_obs1 <- (runif(NNobs) < 0.5)
+pred_graph <-subset(BoogieDown, graph_obs1)
+# plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
+predictb <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
+BoogieDown$yhata <- predict(model_BoogieDown, predictb, type = "response")
+table(BoogieDown$yhata)
+pred_model_BoogieDown <- (BoogieDown$yhata > 0.8)
+#table(pred = pred_model_BoogieDown, true = BoogieDown$LABFORCE)
+#prop.table(table(pred = pred_model_BoogieDown, true = BoogieDown$LABFORCE))
+detach()
+```
+
+### Conclusion
+Using these models very clearly demonstrates that although what we think would be an obvious indicator of whether someone participates in the labor force or not, there are many confounding factors. We saw lots of negative numbers, numbers above 1 and unanticipated movements of coefficients as new variables were added or removed. We also saw patterns of statistical significance in the trend of how smaller families tended to have a higher probability than medium or large-sized families to participate in the labor force. Whilst this initially seemed counter intuitive, it does adhere to fundamental probability theory in that when you have multiple events, the probability will always be smaller than a singular event.
+
+
 ### Bibliography
-Accessed: 11/09/2020 https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder
+Accessed: 11/09/2020 
 
 https://www.bls.gov/cps/definitions.htm#laborforce
 
+https://www.bls.gov/emp/tables/civilian-labor-force-participation-rate.htm 
+
+https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder
+
 https://usa.ipums.org/usa-action/variables/FAMSIZE#description_section
+
