@@ -7,8 +7,8 @@ output: github_document
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-setwd("~/CCNY/Econometrics/Homework/Draft Hwk Files")
-load("acs2017_ny_data.RData")
+setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
+load("acs2017_ny_data copy.RData")
 attach(acs2017_ny)
 detach()
 ```
@@ -90,7 +90,7 @@ dat_use1$LargeFamily <- as.numeric((dat_use1$FAMSIZE >= 7) & (dat_use1$FAMSIZE <
 
 ```
 
-# Logit: Fam Size ONLY
+# Logit: Fam Size Only
 Next, let's run the logit regression to see how the family sizes affect whether someone is in the labor force or not. 
 
 Expectation: We are expecting that one of the three (3) variables will drop off as that is necessary so that the variables can be compared to something. We were thinking that the larger the size of the family the less likely the labor participation rate would be because the more people in a household the less likely everyone in the household would need to work. The counter argument to that is that those with larger families have more mouths to feed and thus would increase their likelihood to be in the labor force. So it is hard to estimate which of the three (3) family sizes will show to have the largest effect on labor participation rates.
@@ -110,6 +110,23 @@ Result: Small families continue to show the highest probability of labor force p
 model_logit3 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
             family = binomial, data = dat_use1)
 summary(model_logit3)
+
+#Predictions - Logit: All Variables
+attach(dat_use1)
+NNobs <- length(dat_use1$LABFORCE)
+set.seed(12345)
+graph_obs <- (runif(NNobs) < 0.5)
+pred_graph <-subset(dat_use1, graph_obs)
+plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
+predict1 <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
+dat_use1$yhata <- predict(model_logit3, predict1, type = "response")
+table(dat_use1$yhata)
+pred_model_logit3 <- (dat_use1$yhata > 0.80)
+table(pred = pred_model_logit3, true = dat_use1$LABFORCE)
+prop.table(table(pred = pred_model_logit3, true = dat_use1$LABFORCE))
+predacc1 <- sum(0.07214252+0.52641623)
+predacc1
+detach()
 ```
 
 # Logit: All Variables (Interactions)
@@ -119,23 +136,23 @@ Result: The interactions of family size and being female appear to be negative. 
 model_logit4 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) + I(female*AGE),
             family = binomial, data = dat_use1)
 summary(model_logit4)
-```
-```{r}
+
+#Predictions - Logit: All Variables (Interactions)
 attach(dat_use1)
-NNobs <- length(dat_use1$LABFORCE)
-set.seed(12345)
-graph_obs <- (runif(NNobs) < 0.5)
-pred_graph <-subset(dat_use1, graph_obs)
 plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
-predict1 <- data.frame((AGE >= 25) & (AGE <= 35), female = 0, educ_nohs = 1, educ_hs = 0, educ_somecoll = 0, educ_college = 0, educ_advdeg = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
-dat_use1$yhata <- predict(model_logit4, predict1, type = "response")
+predict2 <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
+dat_use1$yhata <- predict(model_logit4, predict2, type = "response")
 table(dat_use1$yhata)
 pred_model_logit1 <- (dat_use1$yhata > 0.88)
 table(pred = pred_model_logit1, true = dat_use1$LABFORCE)
 prop.table(table(pred = pred_model_logit1, true = dat_use1$LABFORCE))
-predacc <- sum(0.09349436+0.42802429)
-predacc
+predacc2 <- sum(0.09349436+0.42802429)
+predacc2
 detach()
+```
+
+```{r}
+
 ```
 ```{r eval=FALSE, include=FALSE}
 # quartz(title="Labor Force Participation") # creates a quartz window with title
@@ -155,72 +172,75 @@ curve(predict(g, data.frame(AGE=x, female=x, MediumFamily=x, LargeFamily=x, Smal
 detach()
 ```
 
-How do we do the zero-to-one plots?
-
-# For homework, I will ask for predicted values so you can start to figure out how to get those.
-
-# Do the X variables have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
 
 
-# Start of Probit Models
+# Probit: All Variables
+Result: The Probit estimation also shows small familes with the highest probabilities to being in the labor force, which is similar to the logit models, albeit with a smaller probability than logit. The medium-size and large-size families follow just like in the logit models.
+```{r}
+model_probit1 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
+            family = binomial (link = 'probit'), data = dat_use1)
+summary(model_probit1)
 
-Also estimate a probit model (details in Lecture Notes) and OLS, with the same X and Y variables. Compare the results, such as coefficients and predicted values. If you're eager, try to split the sample into training and test data, then compare which model predicts better in the sample that it hasn't seen yet.
-
-Logit models are very very commonly used in many models. But on the other hand there are people that say it says too much. Sometimes bland "OLS" might be better
-
-# Notes
-```{r eval=FALSE}
-#How do OLS and logit compare?
-
-#OLS is just creating a line. 
-
-#Our y variable can only be equal to 0 or 1, this can possibly be a problem for some situations.
-
-#With a logit, it is strained to produce a value between 0 and 1.
-
-#difference between logit and probit? Usually very minor.....
-
-#think of it that "not one model is right," think of it that we need to use all these models. To what extent am i confident on using these as a basis for a prediction?
-
-#I can use a logit, probit and OLS model. And then amalgamate all three together
-
-#it depends on the range of your x variables
-
-#greater than 1 means there are probably other factors
-
-#generally, we can easily interpret the sign of a coefficient, but the actual number of the coefficient is not easily interpreted as many 
-
-#what should we do with dropped variables? It has to drop to one variable, so that people who are 
-
-#the amount people spend on their utility is probably gonna be related to their income
-#if i make a lot of money, i might move somewhere that is nicer that probably will have higher utility costs
-
-#logit case - the Y can only take two possible answers: is the person in the labor force or not? Does someone have health insurance? We cannot do this with marital status because someone would be unmarried now but they were married once before.
-
-#How do people choose, what type of commute they use to work?
-#Logit: did people take public transportation or not?
-#subdivide: if it is public transit, what form of public transit?
-#COVID-19: Did the person work from home or not?
+attach(dat_use1)
+plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
+predict3 <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
+dat_use1$yhata <- predict(model_probit1, predict3, type = "response")
+table(dat_use1$yhata)
+pred_model_probit1 <- (dat_use1$yhata > 0.80)
+table(pred = pred_model_probit1, true = dat_use1$LABFORCE)
+prop.table(table(pred = pred_model_probit1, true = dat_use1$LABFORCE))
+predacc3 <- sum(0.06579035+0.55349303)
+predacc3
+detach()
 ```
 
+# Probit: All Variables (Interactions)
+Result: The resulting probit regression on the same X and Y variables (along with the same interactions) are very similar to logit model where we see all the interactions between female and all three sizes of family have a negative probability but the probability is not as pronounced in the profit model as in the logit model.
+```{r}
+model_probit2 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) + I(female*AGE),
+            family = binomial (link = 'probit'), data = dat_use1)
+summary(model_probit2)
 
-## Appendix
+#Prediction - Probit: All Variables (Interactions)
 
-To clear up some of the definitions,
-```{r eval=FALSE}
-acs2017_ny$EMPSTAT <- as.factor(acs2017_ny$EMPSTAT)
-levels(acs2017_ny$EMPSTAT) <- c("NA","Employed","Unemployed","Not in LF")
-acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
-levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
-acs2017_ny$CLASSWKR <- as.factor(acs2017_ny$CLASSWKR)
-levels(acs2017_ny$CLASSWKR) <- c("NA","self employed","work for wages")
-acs2017_ny$WKSWORK2 <- as.factor(acs2017_ny$WKSWORK2)
-levels(acs2017_ny$WKSWORK2) <- c("NA","1-13 wks","14-26 wks","27-39 wks","40-47 wks","48-49 wks","50-52 wks")
-# although note that making this a factor breaks some earlier code where we used (WKSWORK2 > 4) so you might not want to run that code or else change to WKSWORK2_factor <- as.factor(WKSWORK2). Which is arguably better for various other reasons.
-# these help clarify how these definitions work together
-table(acs2017_ny$EMPSTAT,acs2017_ny$LABFORCE)
-table(acs2017_ny$EMPSTAT,acs2017_ny$CLASSWKR)
+attach(dat_use1)
+plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
+predict4 <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
+dat_use1$yhata <- predict(model_probit2, predict4, type = "response")
+table(dat_use1$yhata)
+pred_model_probit2 <- (dat_use1$yhata > 0.88)
+table(pred = pred_model_probit2, true = dat_use1$LABFORCE)
+prop.table(table(pred = pred_model_probit2, true = dat_use1$LABFORCE))
+predacc4 <- sum(0.09864549+0.40342964)
+predacc4
+detach()
 ```
+
+# Comparing all the predictions
+Result: Comparing the logit and the probit where we used *All Variables* we can see that both the logit and probit models predicted accurately ~60% of the time. And for the *All Variables (Interaction)* we can see that both models predicted ~51%. In the end, we are able to see what we learned from the lecture notes: that probit and logit are approximately the same; the differences are rather small.
+```{r}
+#Logit: All Variables
+predacc1
+
+#Probit: All Variables
+predacc3
+
+
+#Logit: All Variables (Interaction)
+predacc2
+
+#Probit: All Variables (Interaction)
+predacc4
+
+```
+
+#OLS: All Variables
+
+
+
+
+
+
 
 ### Bibliography
 Accessed: 11/09/2020 https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder

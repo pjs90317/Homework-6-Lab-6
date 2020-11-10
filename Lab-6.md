@@ -141,7 +141,7 @@ three (3) family sizes similar to the (5) columns for education
 serve as the “dropped variable” when we are running our logit
 regressions)
 
-# Logit: Fam Size ONLY
+# Logit: Fam Size Only
 
 Next, let’s run the logit regression to see how the family sizes affect
 whether someone is in the labor force or not.
@@ -231,6 +231,41 @@ variables.
     ## 
     ## Number of Fisher Scoring iterations: 4
 
+![](Lab-6_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+    ## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
+    ## prediction from a rank-deficient fit may be misleading
+
+    ## 
+    ## 0.782049822949747 0.784094351232601 0.786124945491883 0.788141602115143 
+    ##              2950              2999              2944              2907 
+    ## 0.790144319544462 0.792133098248625 0.794107940694993 0.796068851321099 
+    ##              2606              2748              2414              2532 
+    ## 0.798015836505979 0.799948904541277 0.801868065602124 0.803773331717816 
+    ##              2548              2505              2466              2151 
+    ##  0.80566471674232 0.807542236324607 0.809405907878852 0.811255750554504 
+    ##              2067              2289              2229              2510 
+    ## 0.813091785206246 0.814914034363867 0.816722522202064  0.81851727451018 
+    ##              2321              2271              2358              2326 
+    ## 0.820298318661906 0.822065683584958 0.823819399730745  0.82555949904404 
+    ##              2552              2372              2315              2449 
+    ## 0.827286014932679 0.828998982237288 0.830698437201063 0.832384417439615 
+    ##              2455              2623              2494              2504 
+    ## 0.834056961910891 0.835716110885181 
+    ##              2560              2470
+
+    ##        true
+    ## pred    Not in LF in LF
+    ##   FALSE      5406 21747
+    ##   TRUE       8335 39447
+
+    ##        true
+    ## pred     Not in LF      in LF
+    ##   FALSE 0.07214252 0.29021152
+    ##   TRUE  0.11122973 0.52641623
+
+    ## [1] 0.5985588
+
 # Logit: All Variables (Interactions)
 
 Result: The interactions of family size and being female appear to be
@@ -273,24 +308,24 @@ only changes 0.09% with every year increase in age.
     ## 
     ## Number of Fisher Scoring iterations: 5
 
-![](Lab-6_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](Lab-6_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
     ## 
-    ## 0.860779455857246 0.862260546681493 0.863728375437847 0.865183007862796 
+    ## 0.860779455857241 0.862260546681488 0.863728375437842 0.865183007862792 
     ##              2950              2999              2944              2907 
-    ## 0.866624510531691 0.868052950828762  0.86946839691749 0.870870917711318 
+    ## 0.866624510531686 0.868052950828758 0.869468396917486 0.870870917711314 
     ##              2606              2748              2414              2532 
-    ## 0.872260582844717 0.873637462644618 0.875001628102205 0.876353150845078 
+    ## 0.872260582844713 0.873637462644614 0.875001628102202 0.876353150845074 
     ##              2548              2505              2466              2151 
-    ## 0.877692103109785  0.87901855771474 0.880332588033515 0.881634267968514 
+    ## 0.877692103109782 0.879018557714737 0.880332588033512 0.881634267968511 
     ##              2067              2289              2229              2510 
-    ##  0.88292367192504 0.884200874785746 0.885465951885478  0.88671897898651 
+    ## 0.882923671925037 0.884200874785744 0.885465951885476 0.886718978986508 
     ##              2321              2271              2358              2326 
-    ## 0.887960032254177 0.889189188232896 0.890406523822594 0.891612116255524 
+    ## 0.887960032254175 0.889189188232895 0.890406523822593 0.891612116255522 
     ##              2552              2372              2315              2449 
-    ## 0.892806043073481 0.893988382105424 0.895159211445482 0.896318609431368 
+    ##  0.89280604307348 0.893988382105423 0.895159211445481 0.896318609431367 
     ##              2455              2623              2494              2504 
-    ## 0.897466654623188 0.898603425782644 
+    ## 0.897466654623187 0.898603425782644 
     ##              2560              2470
 
     ##        true
@@ -305,29 +340,170 @@ only changes 0.09% with every year increase in age.
 
     ## [1] 0.5215186
 
-How do we do the zero-to-one plots?
+# Probit: All Variables
 
-# For homework, I will ask for predicted values so you can start to figure out how to get those.
+Result: The Probit estimation also shows small familes with the highest
+probabilities to being in the labor force, which is similar to the logit
+models, albeit with a smaller probability than logit. The medium-size
+and large-size families follow just like in the logit models.
 
-# Do the X variables have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
+    ## 
+    ## Call:
+    ## glm(formula = LABFORCE ~ AGE + female + SmallFamily + MediumFamily + 
+    ##     LargeFamily + Individual, family = binomial(link = "probit"), 
+    ##     data = dat_use1)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -2.2155   0.4513   0.5633   0.6693   0.9944  
+    ## 
+    ## Coefficients: (1 not defined because of singularities)
+    ##               Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)   0.974338   0.027452  35.493  < 2e-16 ***
+    ## AGE          -0.006627   0.000611 -10.847  < 2e-16 ***
+    ## female       -0.330755   0.010996 -30.080  < 2e-16 ***
+    ## SmallFamily   0.564221   0.014526  38.843  < 2e-16 ***
+    ## MediumFamily  0.427560   0.014697  29.092  < 2e-16 ***
+    ## LargeFamily   0.177056   0.029283   6.046 1.48e-09 ***
+    ## Individual          NA         NA      NA       NA    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 71408  on 74934  degrees of freedom
+    ## Residual deviance: 69086  on 74929  degrees of freedom
+    ## AIC: 69098
+    ## 
+    ## Number of Fisher Scoring iterations: 4
 
-# Start of Probit Models
+![](Lab-6_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
-Also estimate a probit model (details in Lecture Notes) and OLS, with
-the same X and Y variables. Compare the results, such as coefficients
-and predicted values. If you’re eager, try to split the sample into
-training and test data, then compare which model predicts better in the
-sample that it hasn’t seen yet.
+    ## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
+    ## prediction from a rank-deficient fit may be misleading
 
-Logit models are very very commonly used in many models. But on the
-other hand there are people that say it says too much. Sometimes bland
-“OLS” might be better
+    ## 
+    ## 0.784326659497045   0.7862615593576 0.788186310494023  0.79010088204436 
+    ##              2950              2999              2944              2907 
+    ##   0.7920052442017 0.793899368212494 0.795783226374691 0.797656792035702 
+    ##              2606              2748              2414              2532 
+    ## 0.799520039590191 0.801372944477698 0.803215483180086 0.805047633218824 
+    ##              2548              2505              2466              2151 
+    ## 0.806869373152101 0.808680682571776 0.810481542100163 0.812271933386657 
+    ##              2067              2289              2229              2510 
+    ## 0.814051839104191 0.815821242945547 0.817580129619502 0.819328484846814 
+    ##              2321              2271              2358              2326 
+    ##  0.82106629535607 0.822793548879367 0.824510234147849   0.8262163408871 
+    ##              2552              2372              2315              2449 
+    ## 0.827911859812385  0.82959678262375 0.831271102000981 0.832934811598417 
+    ##              2455              2623              2494              2504 
+    ## 0.834587906039634 0.836230380911986 
+    ##              2560              2470
 
-# Notes
+    ##        true
+    ## pred    Not in LF in LF
+    ##   FALSE      4930 19718
+    ##   TRUE       8811 41476
 
-## Appendix
+    ##        true
+    ## pred     Not in LF      in LF
+    ##   FALSE 0.06579035 0.26313472
+    ##   TRUE  0.11758190 0.55349303
 
-To clear up some of the definitions,
+    ## [1] 0.6192834
+
+# Probit: All Variables (Interactions)
+
+Result: The resulting probit regression on the same X and Y variables
+(along with the same interactions) are very similar to logit model where
+we see all the interactions between female and all three sizes of family
+have a negative probability but the probability is not as pronounced in
+the profit model as in the logit model.
+
+    ## 
+    ## Call:
+    ## glm(formula = LABFORCE ~ AGE + female + MediumFamily + LargeFamily + 
+    ##     SmallFamily + I(MediumFamily * female) + I(LargeFamily * 
+    ##     female) + I(SmallFamily * female) + I(female * AGE), family = binomial(link = "probit"), 
+    ##     data = dat_use1)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -2.3103   0.4133   0.5083   0.7099   1.0097  
+    ## 
+    ## Coefficients:
+    ##                           Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)               0.711687   0.040126  17.736  < 2e-16 ***
+    ## AGE                      -0.006285   0.000937  -6.708 1.98e-11 ***
+    ## female                    0.335983   0.055020   6.107 1.02e-09 ***
+    ## MediumFamily              0.932423   0.021819  42.734  < 2e-16 ***
+    ## LargeFamily               0.719815   0.048538  14.830  < 2e-16 ***
+    ## SmallFamily               0.790468   0.020154  39.220  < 2e-16 ***
+    ## I(MediumFamily * female) -1.004892   0.030645 -32.792  < 2e-16 ***
+    ## I(LargeFamily * female)  -1.080143   0.062281 -17.343  < 2e-16 ***
+    ## I(SmallFamily * female)  -0.563447   0.029481 -19.112  < 2e-16 ***
+    ## I(female * AGE)          -0.001576   0.001244  -1.267    0.205    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 71408  on 74934  degrees of freedom
+    ## Residual deviance: 67899  on 74925  degrees of freedom
+    ## AIC: 67919
+    ## 
+    ## Number of Fisher Scoring iterations: 4
+
+![](Lab-6_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+    ## 
+    ## 0.861221375490006 0.862607226750129 0.863983598172992 0.865350500608589 
+    ##              2950              2999              2944              2907 
+    ## 0.866707945577768 0.868055945266239 0.869394512518527 0.870723660831854 
+    ##              2606              2748              2414              2532 
+    ## 0.872043404349967 0.873353757856907 0.874654736770717 0.875946357137101 
+    ##              2548              2505              2466              2151 
+    ## 0.877228635623025 0.878501589510268 0.879765236688925 0.881019595650855 
+    ##              2067              2289              2229              2510 
+    ## 0.882264685483091 0.883500525861197 0.884727137042585 0.885944539859791 
+    ##              2321              2271              2358              2326 
+    ## 0.887152755713708 0.888351806566782 0.889541714936171 0.890722503886867 
+    ##              2552              2372              2315              2449 
+    ## 0.891894197024787  0.89305681848983 0.894210392948902 0.895354945588914 
+    ##              2455              2623              2494              2504 
+    ## 0.896490502109756 0.897617088717235 
+    ##              2560              2470
+
+    ##        true
+    ## pred    Not in LF in LF
+    ##   FALSE      7392 30963
+    ##   TRUE       6349 30231
+
+    ##        true
+    ## pred     Not in LF      in LF
+    ##   FALSE 0.09864549 0.41319811
+    ##   TRUE  0.08472676 0.40342964
+
+    ## [1] 0.5020751
+
+# Comparing all the predictions
+
+Result: Comparing the logit and the probit where we used *All Variables*
+we can see that both the logit and probit models predicted accurately
+\~60% of the time. And for the *All Variables (Interaction)* we can see
+that both models predicted \~51%. In the end, we are able to see what we
+learned from the lecture notes: that probit and logit are approximately
+the same; the differences are rather small.
+
+    ## [1] 0.5985588
+
+    ## [1] 0.6192834
+
+    ## [1] 0.5215186
+
+    ## [1] 0.5020751
+
+\#OLS: All Variables
 
 ### Bibliography
 
