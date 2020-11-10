@@ -2,43 +2,101 @@ Lab 6
 ================
 Patrick Sinclair, Kieran Yuen
 
-``` r
-setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
-load("acs2017_ny_data copy.RData")
-attach(acs2017_ny)
-detach()
-```
+### Factoring LABFORCE and MARST
 
-\#Factoring LABFORCE and MARST
+### Data Check
 
-``` r
-acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
-levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
-acs2017_ny$MARST <- as.factor(acs2017_ny$MARST)
-levels(acs2017_ny$MARST) <- c("married spouse present","married spouse absent","separated","divorced","widowed","never married")
-```
+As we are using the ACS Data to examine labor force participation, we
+double check we have the correct interpretation of “NA” as a label
+within the variable. Per the [Bureau of Labor
+Statistics](https://www.bls.gov/cps/definitions.htm#laborforce) website,
+“NA” should indicate that that particular respondent is too young and
+*is not* eligible to be counted in the labor force.
 
-\#Creating a subset of just those in the Labor Force
+    ##           
+    ##               NA Not in LF in LF
+    ##   (0,15]   31680         0     0
+    ##   (15,25]      0     11717 13256
+    ##   (25,35]      0      4271 20523
+    ##   (35,45]      0      4064 18924
+    ##   (45,55]      0      5406 21747
+    ##   (55,65]      0     10563 18106
+    ##   (65,100]     0     28701  5880
 
-``` r
-workers <- (acs2017_ny$LABFORCE =="in LF")
-dat_workers <- subset(acs2017_ny,workers)
-```
+    ## 
+    ##        NA Not in LF     in LF 
+    ##     31680     64722     98436
+
+    ##           
+    ##            Not in LF     in LF
+    ##   (0,15]                      
+    ##   (15,25]  0.4691867 0.5308133
+    ##   (25,35]  0.1722594 0.8277406
+    ##   (35,45]  0.1767879 0.8232121
+    ##   (45,55]  0.1990940 0.8009060
+    ##   (55,65]  0.3684468 0.6315532
+    ##   (65,100] 0.8299644 0.1700356
+
+Here, we’ve broken the ages into groups, including an extra group to
+check whether our assumption about the “NA” label was correct. Only the
+age 0-15 returns any “NA” observations.
+
+“Not in the Labor Force” are those respondents who are not participating
+in the labor force during the survey week. These people may be retirees
+or students.
+
+In the second table, we can see the proportion of respondents within the
+various age brackets who are and who are not participating in the labor
+force. Other predictors that we think may give an indication of whether
+a person is participating in the labor force are their [family
+size](https://usa.ipums.org/usa-action/variables/FAMSIZE#description_section).
+This may have some confounding issues - heads of larger households
+([householders](https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder)
+maybe be more likely to work while those who are not leading the family
+unit may not be as likely to participate in the workforce.
+
+We also think rent may be a good indicator of whether a person is
+participation in the workforce. Lower rents may still be affordable to
+those who are retired, students or unable to actively participate in the
+labor force while higher rents would require someone to be working.
+
+Finally, we thought examining whether someone is living below the
+poverty line would be a good indicator. The initial assumption is that
+those below the poverty line are less likely to be participating in the
+labor force, *however*, given the NYC minimum wage in 2017 was $11.00,
+it is conceivable that even those working may still be living below the
+[poverty
+line](https://www2.census.gov/programs-surveys/cps/tables/time-series/historical-poverty-thresholds/thresh17.xls).
+This is even more likely if the [NYC thresholds,
+p. 8](https://www1.nyc.gov/assets/opportunity/pdf/NYCgovPoverty2019_Appendix_B.pdf)
+are used instead of the US National guidelines.
+
+    ## poorworkers
+    ##     0     1 
+    ## 92244  6192
+
+    ## poorworkers
+    ##          0          1 
+    ## 0.93709618 0.06290382
+
+When we compare the groups, those in the workforce who live below the
+poverty line comprise only 6.29% of the workforce.
+
+However, of those who live below the poverty line, 25.8% are active in
+the workforce. A step further would be to assess how many of those not
+in the labor force are discouraged workers.
+
+    ## poverty
+    ##        NA Not in LF     in LF 
+    ##      5833     11960      6192
+
+    ## poverty
+    ##        NA Not in LF     in LF 
+    ## 0.2431937 0.4986450 0.2581614
 
 \#Creating an age break band
 
-``` r
-acs2017_ny$age_bands <- cut(acs2017_ny$AGE,breaks=c(0,15, 25,35,45,55,65,100))
-table(acs2017_ny$age_bands,acs2017_ny$LABFORCE)
-```
-
 \#Creating our first subset that we will be performing regressions on
-
-``` r
-pick_use1 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 55)
-dat_use1 <- subset(acs2017_ny, pick_use1)
-dat_use1$LABFORCE <- droplevels(dat_use1$LABFORCE) 
-```
 
 We would like to use FAMSIZE to see how family size affects a person’s
 probabilities of being in the labor force. We decided to break up the
@@ -55,11 +113,6 @@ and bring in income to survive. But we see there is also a good
 proportion of those who are not in the labor force, which allows us to
 be able to do a regression analysis on the difference.
 
-``` r
-acs2017_ny$SizeofFam <- cut(acs2017_ny$FAMSIZE,breaks=c(0,3,6,29))
-table(acs2017_ny$LABFORCE,acs2017_ny$age_bands,acs2017_ny$SizeofFam)
-```
-
 Next, let’s make separate columns in the acs2017 data for each of the
 three (3) family sizes similar to how there are five (5) columns for
 education (educ\_nohs, educ\_hs, etc….).
@@ -67,26 +120,6 @@ education (educ\_nohs, educ\_hs, etc….).
 (Note: we have created an extra “Individual” column so that that can
 serve as the “dropped variable” when we are running our logit
 regressions)
-
-``` r
-acs2017_ny$Individual <- ((acs2017_ny$FAMSIZE >= 0) & (acs2017_ny$FAMSIZE <= 1))
-acs2017_ny$SmallFamily <- ((acs2017_ny$FAMSIZE >= 2) & (acs2017_ny$FAMSIZE <= 3))
-acs2017_ny$MediumFamily <- ((acs2017_ny$FAMSIZE >= 4) & (acs2017_ny$FAMSIZE <= 6))
-acs2017_ny$LargeFamily <- ((acs2017_ny$FAMSIZE >= 7) & (acs2017_ny$FAMSIZE <= 29))
-summary(acs2017_ny$Individual)
-summary(acs2017_ny$SmallFamily) 
-summary(acs2017_ny$MediumFamily) 
-summary(acs2017_ny$LargeFamily)
-
-dat_use1$Individual <- ((dat_use1$FAMSIZE >= 0) & (dat_use1$FAMSIZE <= 1))
-dat_use1$SmallFamily <- ((dat_use1$FAMSIZE >= 2) & (dat_use1$FAMSIZE <= 3))
-dat_use1$MediumFamily <- ((dat_use1$FAMSIZE >= 4) & (dat_use1$FAMSIZE <= 6))
-dat_use1$LargeFamily <- ((dat_use1$FAMSIZE >= 7) & (dat_use1$FAMSIZE <= 29))
-summary(dat_use1$Individual)
-summary(dat_use1$SmallFamily) 
-summary(dat_use1$MediumFamily) 
-summary(dat_use1$LargeFamily)
-```
 
 # Logit: Fam Size ONLY
 
@@ -109,12 +142,6 @@ of being in the labor force. Next would be *medium* families and last is
 *large* families which have the lowest probabilities of being in the
 labor force.
 
-``` r
-model_logit2 <- glm(LABFORCE ~ SmallFamily + MediumFamily + LargeFamily + Individual,
-            family = binomial, data = dat_use1)
-summary(model_logit2)
-```
-
 # Logit: All Variables
 
 Next, let’s add in all the other variables to see how that affects our
@@ -125,12 +152,6 @@ force participation. Followed by medium families. Last is large
 families. All three family sizes are statistically significant at the
 0.05 level.
 
-``` r
-model_logit3 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
-            family = binomial, data = dat_use1)
-summary(model_logit3)
-```
-
 # Logit: All Variables (Interactions)
 
 Result: The interactions of family size and being female appear to be
@@ -138,25 +159,7 @@ negative. This is telling us that being female negative impacts the
 probabilities of being in the labor force whatever the person’s family
 size maybe.
 
-``` r
-model_logit4 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + Individual + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) +I(Individual*female)  + I(female*AGE),
-            family = binomial, data = dat_use1)
-summary(model_logit4)
-```
-
 How do we do the zero-to-one plots?
-
-``` r
-#graveyard <- (( >= 0) & (DEPARTS <= 459))
-#morning <- ((DEPARTS >= 500) & (DEPARTS <=930))
-#daytime <- ((DEPARTS >= 931) & (DEPARTS <=1700))
-#evening <- ((DEPARTS >= 1701) & (DEPARTS <=2359))
-#summary(graveyard)
-#summary(morning)
-#summary(daytime)
-#summary(evening)
-#table(morning)
-```
 
 # For homework, I will ask for predicted values so you can start to figure out how to get those.
 
@@ -176,55 +179,6 @@ other hand there are people that say it says too much. Sometimes bland
 
 # Notes
 
-``` r
-#How do OLS and logit compare?
-
-#OLS is just creating a line. 
-
-#Our y variable can only be equal to 0 or 1, this can possibly be a problem for some situations.
-
-#With a logit, it is strained to produce a value between 0 and 1.
-
-#difference between logit and probit? Usually very minor.....
-
-#think of it that "not one model is right," think of it that we need to use all these models. To what extent am i confident on using these as a basis for a prediction?
-
-#I can use a logit, probit and OLS model. And then amalgamate all three together
-
-#it depends on the range of your x variables
-
-#greater than 1 means there are probably other factors
-
-#generally, we can easily interpret the sign of a coefficient, but the actual number of the coefficient is not easily interpreted as many 
-
-#what should we do with dropped variables? It has to drop to one variable, so that people who are 
-
-#the amount people spend on their utility is probably gonna be related to their income
-#if i make a lot of money, i might move somewhere that is nicer that probably will have higher utility costs
-
-#logit case - the Y can only take two possible answers: is the person in the labor force or not? Does someone have health insurance? We cannot do this with marital status because someone would be unmarried now but they were married once before.
-
-#How do people choose, what type of commute they use to work?
-#Logit: did people take public transportation or not?
-#subdivide: if it is public transit, what form of public transit?
-#COVID-19: Did the person work from home or not?
-```
-
 ## Appendix
 
 To clear up some of the definitions,
-
-``` r
-acs2017_ny$EMPSTAT <- as.factor(acs2017_ny$EMPSTAT)
-levels(acs2017_ny$EMPSTAT) <- c("NA","Employed","Unemployed","Not in LF")
-acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
-levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
-acs2017_ny$CLASSWKR <- as.factor(acs2017_ny$CLASSWKR)
-levels(acs2017_ny$CLASSWKR) <- c("NA","self employed","work for wages")
-acs2017_ny$WKSWORK2 <- as.factor(acs2017_ny$WKSWORK2)
-levels(acs2017_ny$WKSWORK2) <- c("NA","1-13 wks","14-26 wks","27-39 wks","40-47 wks","48-49 wks","50-52 wks")
-# although note that making this a factor breaks some earlier code where we used (WKSWORK2 > 4) so you might not want to run that code or else change to WKSWORK2_factor <- as.factor(WKSWORK2). Which is arguably better for various other reasons.
-# these help clarify how these definitions work together
-table(acs2017_ny$EMPSTAT,acs2017_ny$LABFORCE)
-table(acs2017_ny$EMPSTAT,acs2017_ny$CLASSWKR)
-```

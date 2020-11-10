@@ -5,26 +5,58 @@ author: Patrick Sinclair, Kieran Yuen
 output: github_document
 ---
 
-```{r}
-setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
-load("acs2017_ny_data copy.RData")
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+setwd("C:/Users/psin7/Documents/CCNY/Econometrics/Homework/Draft Hwk Files")
+load("acs2017_ny_data.RData")
 attach(acs2017_ny)
 detach()
 ```
 
-#Factoring LABFORCE and MARST
-```{r eval=FALSE}
+### Factoring LABFORCE and MARST
+```{r}
 acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
 levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
 acs2017_ny$MARST <- as.factor(acs2017_ny$MARST)
 levels(acs2017_ny$MARST) <- c("married spouse present","married spouse absent","separated","divorced","widowed","never married")
 ```
+### Data Check
+As we are using the ACS Data to examine labor force participation, we double check we have the correct interpretation of "NA" as a label within the variable. Per the [Bureau of Labor Statistics](https://www.bls.gov/cps/definitions.htm#laborforce) website, "NA" should indicate that that particular respondent is too young and *is not* eligible to be counted in the labor force.
+```{r}
+acs2017_ny$age_bands <- cut(acs2017_ny$AGE,breaks=c(0,15,25,35,45,55,65,100))
+table(acs2017_ny$age_bands,acs2017_ny$LABFORCE)
+lftable <- table(acs2017_ny$age_bands,acs2017_ny$LABFORCE)
+margin.table(lftable, 2)
+proplfrow <- prop.table(lftable[ ,2:3], 1)
+proplfrow
+```
+Here, we've broken the ages into groups, including an extra group to check whether our assumption about the "NA" label was correct. Only the age 0-15 returns any "NA" observations.
 
-#Creating a subset of just those in the Labor Force
-```{r eval=FALSE}
+"Not in the Labor Force" are those respondents who are not participating in the labor force during the survey week. These people may be retirees or students.
+
+In the second table, we can see the proportion of respondents within the various age brackets who are and who are not participating in the labor force. Other predictors that we think may give an indication of whether a person is participating in the labor force are their [family size](https://usa.ipums.org/usa-action/variables/FAMSIZE#description_section). This may have some confounding issues - heads of larger households ([householders](https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder) maybe be more likely to work while those who are not leading the family unit may not be as likely to participate in the workforce.
+
+We also think rent may be a good indicator of whether a person is participation in the workforce. Lower rents may still be affordable to those who are retired, students or unable to actively participate in the labor force while higher rents would require someone to be working.
+
+Finally, we thought examining whether someone is living below the poverty line would be a good indicator. The initial assumption is that those below the poverty line are less likely to be participating in the labor force, *however*, given the NYC minimum wage in 2017 was $11.00, it is conceivable that even those working may still be living below the [poverty line](https://www2.census.gov/programs-surveys/cps/tables/time-series/historical-poverty-thresholds/thresh17.xls). This is even more likely if the [NYC thresholds, p. 8](https://www1.nyc.gov/assets/opportunity/pdf/NYCgovPoverty2019_Appendix_B.pdf) are used instead of the US National guidelines.
+```{r}
 workers <- (acs2017_ny$LABFORCE =="in LF")
 dat_workers <- subset(acs2017_ny,workers)
+poorworkers <- subset(acs2017_ny, workers)$below_povertyline
+table(poorworkers)
+prop.table(table(poorworkers))
 ```
+When we compare the groups, those in the workforce who live below the poverty line comprise only 6.29% of the workforce.
+
+However, of those who live below the poverty line, 25.8% are active in the workforce. A step further would be to assess how many of those not in the labor force are discouraged workers.
+
+```{r}
+poverty <- subset(acs2017_ny, below_povertyline==1)$LABFORCE
+povertya <- subset(acs2017_ny, below_povertyline==1)
+table(poverty)
+prop.table(table(poverty))
+```
+
 
 #Creating an age break band
 ```{r eval=FALSE}
