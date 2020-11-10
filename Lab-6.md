@@ -1,60 +1,74 @@
----
-title: "Lab 6"
-font-family: 'Corbel'
-author: Patrick Sinclair, Kieran Yuen
-output: github_document
----
+Lab 6
+================
+Patrick Sinclair, Kieran Yuen
 
-```{r}
+``` r
 setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
 load("acs2017_ny_data copy.RData")
 attach(acs2017_ny)
 detach()
 ```
 
-#Factoring LABFORCE and MARST
-```{r eval=FALSE}
+\#Factoring LABFORCE and MARST
+
+``` r
 acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
 levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
 acs2017_ny$MARST <- as.factor(acs2017_ny$MARST)
 levels(acs2017_ny$MARST) <- c("married spouse present","married spouse absent","separated","divorced","widowed","never married")
 ```
 
-#Creating a subset of just those in the Labor Force
-```{r eval=FALSE}
+\#Creating a subset of just those in the Labor Force
+
+``` r
 workers <- (acs2017_ny$LABFORCE =="in LF")
 dat_workers <- subset(acs2017_ny,workers)
 ```
 
-#Creating an age break band
-```{r eval=FALSE}
+\#Creating an age break band
+
+``` r
 acs2017_ny$age_bands <- cut(acs2017_ny$AGE,breaks=c(0,15, 25,35,45,55,65,100))
 table(acs2017_ny$age_bands,acs2017_ny$LABFORCE)
 ```
 
+\#Creating our first subset that we will be performing regressions on
 
-#Creating our first subset that we will be performing regressions on
-```{r eval=FALSE}
+``` r
 pick_use1 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 55)
 dat_use1 <- subset(acs2017_ny, pick_use1)
 dat_use1$LABFORCE <- droplevels(dat_use1$LABFORCE) 
 ```
 
-We would like to use FAMSIZE to see how family size affects a person's probabilities of being in the labor force. We decided to break up the family size column into three groups (# of family members): small (0-3), medium (4-6), large (7-29). 
+We would like to use FAMSIZE to see how family size affects a person’s
+probabilities of being in the labor force. We decided to break up the
+family size column into three groups (\# of family members): small
+(0-3), medium (4-6), large (7-29).
 
-Let's first take a bird's eye view of the acs2017 data to see how many of our three Family size groups are in the Labor Force.
+Let’s first take a bird’s eye view of the acs2017 data to see how many
+of our three Family size groups are in the Labor Force.
 
-Results: Looking at the overview table of our data we can see that a majority of people of all ages and family sizes participate in the labor force. This is to be expected as most people do need to make a living and bring in income to survive. But we see there is also a good proportion of those who are not in the labor force, which allows us to be able to do a regression analysis on the difference.
-```{r eval=FALSE}
+Results: Looking at the overview table of our data we can see that a
+majority of people of all ages and family sizes participate in the labor
+force. This is to be expected as most people do need to make a living
+and bring in income to survive. But we see there is also a good
+proportion of those who are not in the labor force, which allows us to
+be able to do a regression analysis on the difference.
+
+``` r
 acs2017_ny$SizeofFam <- cut(acs2017_ny$FAMSIZE,breaks=c(0,3,6,29))
 table(acs2017_ny$LABFORCE,acs2017_ny$age_bands,acs2017_ny$SizeofFam)
 ```
 
+Next, let’s make separate columns in the acs2017 data for each of the
+three (3) family sizes similar to how there are five (5) columns for
+education (educ\_nohs, educ\_hs, etc….).
 
-Next, let's make separate columns in the acs2017 data for each of the three (3) family sizes similar to how there are five (5) columns for education (educ_nohs, educ_hs, etc....). 
+(Note: we have created an extra “Individual” column so that that can
+serve as the “dropped variable” when we are running our logit
+regressions)
 
-(Note: we have created an extra "Individual" column so that that can serve as the "dropped variable" when we are running our logit regressions)
-```{r eval=FALSE}
+``` r
 acs2017_ny$Individual <- ((acs2017_ny$FAMSIZE >= 0) & (acs2017_ny$FAMSIZE <= 1))
 acs2017_ny$SmallFamily <- ((acs2017_ny$FAMSIZE >= 2) & (acs2017_ny$FAMSIZE <= 3))
 acs2017_ny$MediumFamily <- ((acs2017_ny$FAMSIZE >= 4) & (acs2017_ny$FAMSIZE <= 6))
@@ -75,43 +89,64 @@ summary(dat_use1$LargeFamily)
 ```
 
 # Logit: Fam Size ONLY
-Next, let's run the logit regression to see how the family sizes affect whether someone is in the labor force or not. 
 
-Expectation: We are expecting that one of the three (3) variables will drop off as that is necessary so that the variables can be compared to something. Also, we were thinking that the larger the size of the family the less likely the labor participation rate would be because the more people in a household the less likely everyone in the household would need to work, but the counter argument to that is that those with larger families have more mouths to feed and thus would increase their likelihood to be in the labor force. So it is hard to estimate which of the three (3) family sizes will show to have the largest effect on labor participation rates.
+Next, let’s run the logit regression to see how the family sizes affect
+whether someone is in the labor force or not.
 
-Result: So it appears that *small* families have the highest probability of being in the labor force. Next would be *medium* families and last is *large* families which have the lowest probabilities of being in the labor force.
-```{r eval=FALSE}
+Expectation: We are expecting that one of the three (3) variables will
+drop off as that is necessary so that the variables can be compared to
+something. Also, we were thinking that the larger the size of the family
+the less likely the labor participation rate would be because the more
+people in a household the less likely everyone in the household would
+need to work, but the counter argument to that is that those with larger
+families have more mouths to feed and thus would increase their
+likelihood to be in the labor force. So it is hard to estimate which of
+the three (3) family sizes will show to have the largest effect on labor
+participation rates.
+
+Result: So it appears that *small* families have the highest probability
+of being in the labor force. Next would be *medium* families and last is
+*large* families which have the lowest probabilities of being in the
+labor force.
+
+``` r
 model_logit2 <- glm(LABFORCE ~ SmallFamily + MediumFamily + LargeFamily + Individual,
             family = binomial, data = dat_use1)
 summary(model_logit2)
-
-
 ```
 
 # Logit: All Variables
-Next, let's add in all the other variables to see how that affects our probabilities.
 
-Result: Small families continue to show the highest probability of labor force participation. Followed by medium families. Last is large families. All three family sizes are statistically significant at the 0.05 level.
-```{r eval=FALSE}
+Next, let’s add in all the other variables to see how that affects our
+probabilities.
+
+Result: Small families continue to show the highest probability of labor
+force participation. Followed by medium families. Last is large
+families. All three family sizes are statistically significant at the
+0.05 level.
+
+``` r
 model_logit3 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
             family = binomial, data = dat_use1)
 summary(model_logit3)
-
 ```
 
 # Logit: All Variables (Interactions)
 
-Result: The interactions of family size and being female appear to be negative. This is telling us that being female negative impacts the probabilities of being in the labor force whatever the person's family size maybe.
-```{r eval=FALSE}
+Result: The interactions of family size and being female appear to be
+negative. This is telling us that being female negative impacts the
+probabilities of being in the labor force whatever the person’s family
+size maybe.
+
+``` r
 model_logit4 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + Individual + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) +I(Individual*female)  + I(female*AGE),
             family = binomial, data = dat_use1)
 summary(model_logit4)
-
 ```
 
 How do we do the zero-to-one plots?
 
-```{r eval=FALSE}
+``` r
 #graveyard <- (( >= 0) & (DEPARTS <= 459))
 #morning <- ((DEPARTS >= 500) & (DEPARTS <=930))
 #daytime <- ((DEPARTS >= 931) & (DEPARTS <=1700))
@@ -123,22 +158,25 @@ How do we do the zero-to-one plots?
 #table(morning)
 ```
 
-
-
-
 # For homework, I will ask for predicted values so you can start to figure out how to get those.
 
 # Do the X variables have the expected signs and patterns of significance? Explain if there is a plausible causal link from X variables to Y and not the reverse. Explain your results, giving details about the estimation, some predicted values, and providing any relevant graphics. Impress.
 
-
 # Start of Probit Models
 
-Also estimate a probit model (details in Lecture Notes) and OLS, with the same X and Y variables. Compare the results, such as coefficients and predicted values. If you're eager, try to split the sample into training and test data, then compare which model predicts better in the sample that it hasn't seen yet.
+Also estimate a probit model (details in Lecture Notes) and OLS, with
+the same X and Y variables. Compare the results, such as coefficients
+and predicted values. If you’re eager, try to split the sample into
+training and test data, then compare which model predicts better in the
+sample that it hasn’t seen yet.
 
-Logit models are very very commonly used in many models. But on the other hand there are people that say it says too much. Sometimes bland "OLS" might be better
+Logit models are very very commonly used in many models. But on the
+other hand there are people that say it says too much. Sometimes bland
+“OLS” might be better
 
 # Notes
-```{r eval=FALSE}
+
+``` r
 #How do OLS and logit compare?
 
 #OLS is just creating a line. 
@@ -172,11 +210,11 @@ Logit models are very very commonly used in many models. But on the other hand t
 #COVID-19: Did the person work from home or not?
 ```
 
-
 ## Appendix
 
 To clear up some of the definitions,
-```{r eval=FALSE}
+
+``` r
 acs2017_ny$EMPSTAT <- as.factor(acs2017_ny$EMPSTAT)
 levels(acs2017_ny$EMPSTAT) <- c("NA","Employed","Unemployed","Not in LF")
 acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
@@ -190,5 +228,3 @@ levels(acs2017_ny$WKSWORK2) <- c("NA","1-13 wks","14-26 wks","27-39 wks","40-47 
 table(acs2017_ny$EMPSTAT,acs2017_ny$LABFORCE)
 table(acs2017_ny$EMPSTAT,acs2017_ny$CLASSWKR)
 ```
-
-
