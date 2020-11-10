@@ -7,8 +7,8 @@ output: github_document
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
-load("acs2017_ny_data copy.RData")
+setwd("~/CCNY/Econometrics/Homework/Draft Hwk Files")
+load("acs2017_ny_data.RData")
 attach(acs2017_ny)
 detach()
 ```
@@ -90,10 +90,10 @@ dat_use1$LargeFamily <- as.numeric((dat_use1$FAMSIZE >= 7) & (dat_use1$FAMSIZE <
 
 ```
 
-# Logit: Fam Size Only
-Next, let's run the logit regression to see how the family sizes affect whether someone is in the labor force or not. 
+### Logit: Fam Size Only  
+Next, let's run the logit regression to see how the family sizes affect whether someone is in the labor force or not.   
 
-Expectation: We are expecting that one of the three (3) variables will drop off as that is necessary so that the variables can be compared to something. We were thinking that the larger the size of the family the less likely the labor participation rate would be because the more people in a household the less likely everyone in the household would need to work. The counter argument to that is that those with larger families have more mouths to feed and thus would increase their likelihood to be in the labor force. So it is hard to estimate which of the three (3) family sizes will show to have the largest effect on labor participation rates.
+Expectation: We are expecting that one of the three (3) variables will drop off as that is necessary so that the variables can be compared to something. We were thinking that the larger the size of the family the less likely the labor participation rate would be because the more people in a household the less likely everyone in the household would need to work. The counter argument to that is that those with larger families have more mouths to feed and thus would increase their likelihood to be in the labor force. So it is hard to estimate which of the three (3) family sizes will show to have the largest effect on labor participation rates.  
 
 Result: it appears that *small* families have the highest probability of being in the labor force. Those in *medium* families have the second highest probability of being in the labor force and those with *large* families have the lowest probabilities of being in the labor force. All of these coefficients used an Individual as the basis for comparison.
 ```{r}
@@ -102,10 +102,11 @@ model_logit2 <- glm(LABFORCE ~ SmallFamily + MediumFamily + LargeFamily + Indivi
 summary(model_logit2)
 ```
 
-# Logit: All Variables
+### Logit: All Variables  
 Next, let's add in all the other variables to see how that affects our probabilities.
 
 Result: Small families continue to show the highest probability of labor force participation. Followed by medium families. Last is large families. All three family sizes are statistically significant at the 0.05 level. We note that adding the variables of AGE and gender increase the probabilities of labor force participation of the three family variables.
+![Logit All Varb](./logitallvarb.png)
 ```{r}
 model_logit3 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
             family = binomial, data = dat_use1)
@@ -117,7 +118,7 @@ NNobs <- length(dat_use1$LABFORCE)
 set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.5)
 pred_graph <-subset(dat_use1, graph_obs)
-plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
+# plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
 predict1 <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
 dat_use1$yhata <- predict(model_logit3, predict1, type = "response")
 table(dat_use1$yhata)
@@ -129,8 +130,7 @@ predacc1
 detach()
 ```
 
-# Logit: All Variables (Interactions)
-
+### Logit: All Variables (Interactions)  
 Result: The interactions of family size and being female appear to be negative. This is telling us that being female negative impacts the probabilities of being in the labor force whatever the person's family size. Similarly, women's probability of participation in the labor force only changes 0.09% with every year increase in age.
 ```{r}
 model_logit4 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) + I(female*AGE),
@@ -139,7 +139,7 @@ summary(model_logit4)
 
 #Predictions - Logit: All Variables (Interactions)
 attach(dat_use1)
-plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
+# plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
 predict2 <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
 dat_use1$yhata <- predict(model_logit4, predict2, type = "response")
 table(dat_use1$yhata)
@@ -151,9 +151,6 @@ predacc2
 detach()
 ```
 
-```{r}
-
-```
 ```{r eval=FALSE, include=FALSE}
 # quartz(title="Labor Force Participation") # creates a quartz window with title
 attach(dat_use1)
@@ -176,13 +173,16 @@ detach()
 
 # Probit: All Variables
 Result: The Probit estimation also shows small familes with the highest probabilities to being in the labor force, which is similar to the logit models, albeit with a smaller probability than logit. The medium-size and large-size families follow just like in the logit models.
+![Probit](./probit.png)
 ```{r}
 model_probit1 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
             family = binomial (link = 'probit'), data = dat_use1)
 summary(model_probit1)
 
 attach(dat_use1)
+png(filename="./probit.png")
 plot(LABFORCE ~ AGE, pch = 1, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0,1), xlim = c(0,1), data = pred_graph)
+dev.off
 predict3 <- data.frame((AGE >= 25) & (AGE <= 55), female = 0, SmallFamily = 0, Individual = 0, MediumFamily = 0, LargeFamily = 1)
 dat_use1$yhata <- predict(model_probit1, predict3, type = "response")
 table(dat_use1$yhata)
@@ -221,26 +221,37 @@ Result: Comparing the logit and the probit where we used *All Variables* we can 
 ```{r}
 #Logit: All Variables
 predacc1
-
 #Probit: All Variables
 predacc3
-
-
 #Logit: All Variables (Interaction)
 predacc2
-
 #Probit: All Variables (Interaction)
 predacc4
-
 ```
-
-#OLS: All Variables
-
-
-
-
-
-
+### OLS Regression
+We setup an OLS regression, regressing Labor Force Participation on Age, Gender and family. The slope coefficients are all quite small, though statistically significant. Each of the factors have a statistically significant relationship on labor force participation but in reality, likely little influence.
+```{r}
+dat_use1$LABFORCEa <- as.numeric(dat_use1$LABFORCE)
+olslabforce <- lm(LABFORCEa ~ AGE + female + SmallFamily + MediumFamily + LargeFamily, data = dat_use1)
+summary(olslabforce)
+```
+```{r}
+attach(dat_use1)
+NNobs <- length(INCWAGE)
+set.seed(12345)
+graph_obs <- (runif(NNobs) < 0.5)
+predols <-subset(dat_use1, graph_obs)
+detach()
+```
+```{r}
+png(filename="./olsplot.png")
+plot(LABFORCEa ~ jitter(AGE, factor = 0.1), pch = 16, col = rgb(0, 0.5, 0, alpha = 0.2), ylim = c(0.75,1.25), data = predols)
+olspredict <- data.frame(AGE = 25:55, female = 1, SmallFamily = 0, LargeFamily = 1, MediumFamily = 0)
+olspredict$yhat <- predict(olslabforce, newdata = olspredict)
+lines(yhat ~ AGE, data = olspredict)
+dev.off()
+```
+![OLS Plot](./olsplot.png)  
 
 ### Bibliography
 Accessed: 11/09/2020 https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder

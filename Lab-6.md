@@ -141,7 +141,7 @@ three (3) family sizes similar to the (5) columns for education
 serve as the “dropped variable” when we are running our logit
 regressions)
 
-# Logit: Fam Size Only
+### Logit: Fam Size Only
 
 Next, let’s run the logit regression to see how the family sizes affect
 whether someone is in the labor force or not.
@@ -190,7 +190,7 @@ of these coefficients used an Individual as the basis for comparison.
     ## 
     ## Number of Fisher Scoring iterations: 4
 
-# Logit: All Variables
+### Logit: All Variables
 
 Next, let’s add in all the other variables to see how that affects our
 probabilities.
@@ -200,7 +200,7 @@ force participation. Followed by medium families. Last is large
 families. All three family sizes are statistically significant at the
 0.05 level. We note that adding the variables of AGE and gender increase
 the probabilities of labor force participation of the three family
-variables.
+variables. ![Logit All Varb](./logitallvarb.png)
 
     ## 
     ## Call:
@@ -231,13 +231,11 @@ variables.
     ## 
     ## Number of Fisher Scoring iterations: 4
 
-![](Lab-6_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
     ## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
     ## prediction from a rank-deficient fit may be misleading
 
     ## 
-    ## 0.782049822949747 0.784094351232601 0.786124945491883 0.788141602115143 
+    ## 0.782049822949748 0.784094351232601 0.786124945491883 0.788141602115143 
     ##              2950              2999              2944              2907 
     ## 0.790144319544462 0.792133098248625 0.794107940694993 0.796068851321099 
     ##              2606              2748              2414              2532 
@@ -247,9 +245,9 @@ variables.
     ##              2067              2289              2229              2510 
     ## 0.813091785206246 0.814914034363867 0.816722522202064  0.81851727451018 
     ##              2321              2271              2358              2326 
-    ## 0.820298318661906 0.822065683584958 0.823819399730745  0.82555949904404 
+    ## 0.820298318661906 0.822065683584958 0.823819399730744  0.82555949904404 
     ##              2552              2372              2315              2449 
-    ## 0.827286014932679 0.828998982237288 0.830698437201063 0.832384417439615 
+    ## 0.827286014932679 0.828998982237287 0.830698437201062 0.832384417439615 
     ##              2455              2623              2494              2504 
     ## 0.834056961910891 0.835716110885181 
     ##              2560              2470
@@ -266,7 +264,7 @@ variables.
 
     ## [1] 0.5985588
 
-# Logit: All Variables (Interactions)
+### Logit: All Variables (Interactions)
 
 Result: The interactions of family size and being female appear to be
 negative. This is telling us that being female negative impacts the
@@ -308,24 +306,22 @@ only changes 0.09% with every year increase in age.
     ## 
     ## Number of Fisher Scoring iterations: 5
 
-![](Lab-6_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
-
     ## 
-    ## 0.860779455857241 0.862260546681488 0.863728375437842 0.865183007862792 
+    ## 0.860779455857246 0.862260546681493 0.863728375437847 0.865183007862796 
     ##              2950              2999              2944              2907 
-    ## 0.866624510531686 0.868052950828758 0.869468396917486 0.870870917711314 
+    ## 0.866624510531691 0.868052950828762  0.86946839691749 0.870870917711318 
     ##              2606              2748              2414              2532 
-    ## 0.872260582844713 0.873637462644614 0.875001628102202 0.876353150845074 
+    ## 0.872260582844717 0.873637462644618 0.875001628102205 0.876353150845078 
     ##              2548              2505              2466              2151 
-    ## 0.877692103109782 0.879018557714737 0.880332588033512 0.881634267968511 
+    ## 0.877692103109785  0.87901855771474 0.880332588033515 0.881634267968514 
     ##              2067              2289              2229              2510 
-    ## 0.882923671925037 0.884200874785744 0.885465951885476 0.886718978986508 
+    ##  0.88292367192504 0.884200874785746 0.885465951885478  0.88671897898651 
     ##              2321              2271              2358              2326 
-    ## 0.887960032254175 0.889189188232895 0.890406523822593 0.891612116255522 
+    ## 0.887960032254177 0.889189188232896 0.890406523822594 0.891612116255524 
     ##              2552              2372              2315              2449 
-    ##  0.89280604307348 0.893988382105423 0.895159211445481 0.896318609431367 
+    ## 0.892806043073481 0.893988382105424 0.895159211445482 0.896318609431368 
     ##              2455              2623              2494              2504 
-    ## 0.897466654623187 0.898603425782644 
+    ## 0.897466654623188 0.898603425782644 
     ##              2560              2470
 
     ##        true
@@ -346,6 +342,7 @@ Result: The Probit estimation also shows small familes with the highest
 probabilities to being in the labor force, which is similar to the logit
 models, albeit with a smaller probability than logit. The medium-size
 and large-size families follow just like in the logit models.
+![Probit](./probit.png)
 
     ## 
     ## Call:
@@ -377,7 +374,15 @@ and large-size families follow just like in the logit models.
     ## 
     ## Number of Fisher Scoring iterations: 4
 
-![](Lab-6_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+    ## function (which = dev.cur()) 
+    ## {
+    ##     if (which == 1) 
+    ##         stop("cannot shut down device 1 (the null device)")
+    ##     .External(C_devoff, as.integer(which))
+    ##     dev.cur()
+    ## }
+    ## <bytecode: 0x0000000013728f80>
+    ## <environment: namespace:grDevices>
 
     ## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
     ## prediction from a rank-deficient fit may be misleading
@@ -454,24 +459,24 @@ the profit model as in the logit model.
     ## 
     ## Number of Fisher Scoring iterations: 4
 
-![](Lab-6_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](Lab-6_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
     ## 
-    ## 0.861221375490006 0.862607226750129 0.863983598172992 0.865350500608589 
+    ## 0.861221375490012 0.862607226750134 0.863983598172997 0.865350500608594 
     ##              2950              2999              2944              2907 
-    ## 0.866707945577768 0.868055945266239 0.869394512518527 0.870723660831854 
+    ## 0.866707945577773 0.868055945266244 0.869394512518531 0.870723660831858 
     ##              2606              2748              2414              2532 
-    ## 0.872043404349967 0.873353757856907 0.874654736770717 0.875946357137101 
+    ## 0.872043404349972 0.873353757856912 0.874654736770722 0.875946357137105 
     ##              2548              2505              2466              2151 
-    ## 0.877228635623025 0.878501589510268 0.879765236688925 0.881019595650855 
+    ## 0.877228635623029 0.878501589510272 0.879765236688928 0.881019595650859 
     ##              2067              2289              2229              2510 
-    ## 0.882264685483091 0.883500525861197 0.884727137042585 0.885944539859791 
+    ## 0.882264685483095   0.8835005258612 0.884727137042588 0.885944539859794 
     ##              2321              2271              2358              2326 
-    ## 0.887152755713708 0.888351806566782 0.889541714936171 0.890722503886867 
+    ## 0.887152755713711 0.888351806566785 0.889541714936173 0.890722503886869 
     ##              2552              2372              2315              2449 
-    ## 0.891894197024787  0.89305681848983 0.894210392948902 0.895354945588914 
+    ##  0.89189419702479 0.893056818489833 0.894210392948904 0.895354945588917 
     ##              2455              2623              2494              2504 
-    ## 0.896490502109756 0.897617088717235 
+    ## 0.896490502109758 0.897617088717237 
     ##              2560              2470
 
     ##        true
@@ -503,7 +508,42 @@ the same; the differences are rather small.
 
     ## [1] 0.5020751
 
-\#OLS: All Variables
+### OLS Regression
+
+We setup an OLS regression, regressing Labor Force Participation on Age,
+Gender and family. The slope coefficients are all quite small, though
+statistically significant. Each of the factors have a statistically
+significant relationship on labor force participation but in reality,
+likely little influence.
+
+    ## 
+    ## Call:
+    ## lm(formula = LABFORCEa ~ AGE + female + SmallFamily + MediumFamily + 
+    ##     LargeFamily, data = dat_use1)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -0.92820  0.08913  0.15225  0.20384  0.35835 
+    ## 
+    ## Coefficients:
+    ##                Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)   1.8187538  0.0071233 255.325  < 2e-16 ***
+    ## AGE          -0.0017331  0.0001568 -11.054  < 2e-16 ***
+    ## female       -0.0817857  0.0027945 -29.266  < 2e-16 ***
+    ## SmallFamily   0.1545119  0.0039087  39.530  < 2e-16 ***
+    ## MediumFamily  0.1208572  0.0040176  30.082  < 2e-16 ***
+    ## LargeFamily   0.0506516  0.0081139   6.243 4.33e-10 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.3809 on 74929 degrees of freedom
+    ## Multiple R-squared:  0.03105,    Adjusted R-squared:  0.03099 
+    ## F-statistic: 480.2 on 5 and 74929 DF,  p-value: < 2.2e-16
+
+    ## png 
+    ##   2
+
+![OLS Plot](./olsplot.png)
 
 ### Bibliography
 
