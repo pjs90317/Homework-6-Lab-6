@@ -1,7 +1,9 @@
-Kieran Yuen
-Final Project Initial Research
-November 10, 2020
-================
+---
+title: "Final Project Initial Research"
+author: "Kieran Yuen"
+date: "November 10, 2020"
+output: html_document
+---
 
 My desired topic is in the field of personal finance. I have a strong interest in this field from credit cards to investing to budgeting. I started searching in JSTOR to start to see what I could find on the topic. I came to realize it is a very broad and too general of a topic to search for "personal finance." So I narrowed it down to financial literacy. 
 
