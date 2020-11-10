@@ -235,7 +235,7 @@ variables. ![Logit All Varb](./logitallvarb.png)
     ## prediction from a rank-deficient fit may be misleading
 
     ## 
-    ## 0.782049822949748 0.784094351232601 0.786124945491883 0.788141602115143 
+    ## 0.782049822949747 0.784094351232601 0.786124945491883 0.788141602115143 
     ##              2950              2999              2944              2907 
     ## 0.790144319544462 0.792133098248625 0.794107940694993 0.796068851321099 
     ##              2606              2748              2414              2532 
@@ -245,9 +245,9 @@ variables. ![Logit All Varb](./logitallvarb.png)
     ##              2067              2289              2229              2510 
     ## 0.813091785206246 0.814914034363867 0.816722522202064  0.81851727451018 
     ##              2321              2271              2358              2326 
-    ## 0.820298318661906 0.822065683584958 0.823819399730744  0.82555949904404 
+    ## 0.820298318661906 0.822065683584958 0.823819399730745  0.82555949904404 
     ##              2552              2372              2315              2449 
-    ## 0.827286014932679 0.828998982237287 0.830698437201062 0.832384417439615 
+    ## 0.827286014932679 0.828998982237288 0.830698437201063 0.832384417439615 
     ##              2455              2623              2494              2504 
     ## 0.834056961910891 0.835716110885181 
     ##              2560              2470
@@ -307,21 +307,21 @@ only changes 0.09% with every year increase in age.
     ## Number of Fisher Scoring iterations: 5
 
     ## 
-    ## 0.860779455857246 0.862260546681493 0.863728375437847 0.865183007862796 
+    ## 0.860779455857241 0.862260546681488 0.863728375437842 0.865183007862792 
     ##              2950              2999              2944              2907 
-    ## 0.866624510531691 0.868052950828762  0.86946839691749 0.870870917711318 
+    ## 0.866624510531686 0.868052950828758 0.869468396917486 0.870870917711314 
     ##              2606              2748              2414              2532 
-    ## 0.872260582844717 0.873637462644618 0.875001628102205 0.876353150845078 
+    ## 0.872260582844713 0.873637462644614 0.875001628102202 0.876353150845074 
     ##              2548              2505              2466              2151 
-    ## 0.877692103109785  0.87901855771474 0.880332588033515 0.881634267968514 
+    ## 0.877692103109782 0.879018557714737 0.880332588033512 0.881634267968511 
     ##              2067              2289              2229              2510 
-    ##  0.88292367192504 0.884200874785746 0.885465951885478  0.88671897898651 
+    ## 0.882923671925037 0.884200874785744 0.885465951885476 0.886718978986508 
     ##              2321              2271              2358              2326 
-    ## 0.887960032254177 0.889189188232896 0.890406523822594 0.891612116255524 
+    ## 0.887960032254175 0.889189188232895 0.890406523822593 0.891612116255522 
     ##              2552              2372              2315              2449 
-    ## 0.892806043073481 0.893988382105424 0.895159211445482 0.896318609431368 
+    ##  0.89280604307348 0.893988382105423 0.895159211445481 0.896318609431367 
     ##              2455              2623              2494              2504 
-    ## 0.897466654623188 0.898603425782644 
+    ## 0.897466654623187 0.898603425782644 
     ##              2560              2470
 
     ##        true
@@ -336,13 +336,17 @@ only changes 0.09% with every year increase in age.
 
     ## [1] 0.5215186
 
-# Probit: All Variables
+### Probit: All Variables
 
 Result: The Probit estimation also shows small familes with the highest
 probabilities to being in the labor force, which is similar to the logit
 models, albeit with a smaller probability than logit. The medium-size
-and large-size families follow just like in the logit models.
-![Probit](./probit.png)
+and large-size families follow just like in the logit models. Also, we
+were looking at the plot and were curious if these percentages of “in
+labor force” vs “not in labor force” weer indeed correct. We were able
+to confirm through the [Bureau of Labor Statistics (BLS)
+website](https://www.bls.gov/emp/tables/civilian-labor-force-participation-rate.htm)
+that the proportions were indeed correct. ![Probit](./probit.png)
 
     ## 
     ## Call:
@@ -381,7 +385,7 @@ and large-size families follow just like in the logit models.
     ##     .External(C_devoff, as.integer(which))
     ##     dev.cur()
     ## }
-    ## <bytecode: 0x0000000013728f80>
+    ## <bytecode: 0x7f9d03a35260>
     ## <environment: namespace:grDevices>
 
     ## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
@@ -417,7 +421,7 @@ and large-size families follow just like in the logit models.
 
     ## [1] 0.6192834
 
-# Probit: All Variables (Interactions)
+### Probit: All Variables (Interactions)
 
 Result: The resulting probit regression on the same X and Y variables
 (along with the same interactions) are very similar to logit model where
@@ -462,21 +466,21 @@ the profit model as in the logit model.
 ![](Lab-6_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
     ## 
-    ## 0.861221375490012 0.862607226750134 0.863983598172997 0.865350500608594 
+    ## 0.861221375490006 0.862607226750129 0.863983598172992 0.865350500608589 
     ##              2950              2999              2944              2907 
-    ## 0.866707945577773 0.868055945266244 0.869394512518531 0.870723660831858 
+    ## 0.866707945577768 0.868055945266239 0.869394512518527 0.870723660831854 
     ##              2606              2748              2414              2532 
-    ## 0.872043404349972 0.873353757856912 0.874654736770722 0.875946357137105 
+    ## 0.872043404349967 0.873353757856907 0.874654736770717 0.875946357137101 
     ##              2548              2505              2466              2151 
-    ## 0.877228635623029 0.878501589510272 0.879765236688928 0.881019595650859 
+    ## 0.877228635623025 0.878501589510268 0.879765236688925 0.881019595650855 
     ##              2067              2289              2229              2510 
-    ## 0.882264685483095   0.8835005258612 0.884727137042588 0.885944539859794 
+    ## 0.882264685483091 0.883500525861197 0.884727137042585 0.885944539859791 
     ##              2321              2271              2358              2326 
-    ## 0.887152755713711 0.888351806566785 0.889541714936173 0.890722503886869 
+    ## 0.887152755713708 0.888351806566782 0.889541714936171 0.890722503886867 
     ##              2552              2372              2315              2449 
-    ##  0.89189419702479 0.893056818489833 0.894210392948904 0.895354945588917 
+    ## 0.891894197024787  0.89305681848983 0.894210392948902 0.895354945588914 
     ##              2455              2623              2494              2504 
-    ## 0.896490502109758 0.897617088717237 
+    ## 0.896490502109756 0.897617088717235 
     ##              2560              2470
 
     ##        true
@@ -491,7 +495,7 @@ the profit model as in the logit model.
 
     ## [1] 0.5020751
 
-# Comparing all the predictions
+### Comparing all the predictions
 
 Result: Comparing the logit and the probit where we used *All Variables*
 we can see that both the logit and probit models predicted accurately
@@ -540,16 +544,86 @@ likely little influence.
     ## Multiple R-squared:  0.03105,    Adjusted R-squared:  0.03099 
     ## F-statistic: 480.2 on 5 and 74929 DF,  p-value: < 2.2e-16
 
-    ## png 
-    ##   2
+    ## quartz_off_screen 
+    ##                 2
 
 ![OLS Plot](./olsplot.png)
+
+### Comparison: new subset
+
+Lastly, we wanted to see how changing the subset would change our logit
+and probit models.
+
+Expectation: We had assumed with the higher level of poverty, we would
+see overall reduced probability of participating in the labor force
+
+Result: After running the logit regresison on the new subset, what we
+are actually seeing is that people in larger families are having to
+contribute more, which is the opposite of the rest of the datasets we
+ran above.
+
+    ## Warning: glm.fit: algorithm did not converge
+
+    ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+    ## 
+    ## Call:
+    ## glm(formula = LABFORCE ~ AGE + female + SmallFamily + MediumFamily + 
+    ##     LargeFamily + Individual, family = binomial, data = BoogieDown)
+    ## 
+    ## Deviance Residuals: 
+    ##        Min          1Q      Median          3Q         Max  
+    ## -3.347e-04   2.000e-08   2.000e-08   2.000e-08   4.831e-04  
+    ## 
+    ## Coefficients: (1 not defined because of singularities)
+    ##               Estimate Std. Error z value Pr(>|z|)
+    ## (Intercept)  -525.1682  5016.5741  -0.105    0.917
+    ## AGE            33.8208   317.2271   0.107    0.915
+    ## female          0.1009   317.3168   0.000    1.000
+    ## SmallFamily     0.8709   794.2927   0.001    0.999
+    ## MediumFamily    0.9897   763.0403   0.001    0.999
+    ## LargeFamily     1.0584   902.8005   0.001    0.999
+    ## Individual          NA         NA      NA       NA
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 1.0843e+04  on 10576  degrees of freedom
+    ## Residual deviance: 2.9348e-05  on 10571  degrees of freedom
+    ## AIC: 12
+    ## 
+    ## Number of Fisher Scoring iterations: 25
+
+    ## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
+    ## prediction from a rank-deficient fit may be misleading
+
+    ## 
+    ## 2.22044604925031e-16  5.0645937599597e-08    0.999999959515807 
+    ##                 2052                  158                  170 
+    ##                    1 
+    ##                 8197
+
+### Conclusion
+
+Using these models very clearly demonstrates that although what we think
+would be an obvious indicator of whether someone participates in the
+labor force or not, there are many confounding factors. We saw lots of
+negative numbers, numbers above 1 and unanticipated movements of
+coefficients as new variables were added or removed. We also saw
+patterns of statistical significance in the trend of how smaller
+families tended to have a higher probability than medium or large-sized
+families to participate in the labor force. Whilst this initially seemed
+counter intuitive, it does adhere to fundamental probability theory in
+that when you have multiple events, the probability will always be
+smaller than a singular event.
 
 ### Bibliography
 
 Accessed: 11/09/2020
-<https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder>
 
 <https://www.bls.gov/cps/definitions.htm#laborforce>
+
+<https://www.bls.gov/emp/tables/civilian-labor-force-participation-rate.htm>
+
+<https://www.census.gov/programs-surveys/cps/technical-documentation/subject-definitions.html#householder>
 
 <https://usa.ipums.org/usa-action/variables/FAMSIZE#description_section>
