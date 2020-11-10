@@ -7,13 +7,12 @@ output: github_document
 
 ```{r include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-setwd("/Users/kieranyuen/Documents/Econometrics/Econometrics")
-load("acs2017_ny_data copy.RData")
+setwd("~/CCNY/Econometrics/Homework/Draft Hwk Files")
+load("acs2017_ny_data.RData")
 attach(acs2017_ny)
-detach()
+# detach()
 ```
 
-### Factoring LABFORCE and MARST
 ```{r}
 acs2017_ny$LABFORCE <- as.factor(acs2017_ny$LABFORCE)
 levels(acs2017_ny$LABFORCE) <- c("NA","Not in LF","in LF")
@@ -57,16 +56,8 @@ table(poverty)
 prop.table(table(poverty))
 ```
 
-
-#Creating an age break band
-```{r eval=FALSE}
-acs2017_ny$age_bands <- cut(acs2017_ny$AGE,breaks=c(0,15, 25,35,45,55,65,100))
-table(acs2017_ny$age_bands,acs2017_ny$LABFORCE)
-```
-
-
-#Creating our first subset that we will be performing regressions on
-```{r eval=FALSE}
+### Creating our first subset that we will be performing regressions on
+```{r}
 pick_use1 <- (acs2017_ny$AGE >25) & (acs2017_ny$AGE <= 55)
 dat_use1 <- subset(acs2017_ny, pick_use1)
 dat_use1$LABFORCE <- droplevels(dat_use1$LABFORCE) 
@@ -77,16 +68,16 @@ We would like to use FAMSIZE to see how family size affects a person's probabili
 Let's first take a bird's eye view of the acs2017 data to see how many of our three Family size groups are in the Labor Force.
 
 Results: Looking at the overview table of our data we can see that a majority of people of all ages and family sizes participate in the labor force. This is to be expected as most people do need to make a living and bring in income to survive. But we see there is also a good proportion of those who are not in the labor force, which allows us to be able to do a regression analysis on the difference.
-```{r eval=FALSE}
+```{r}
 acs2017_ny$SizeofFam <- cut(acs2017_ny$FAMSIZE,breaks=c(0,3,6,29))
 table(acs2017_ny$LABFORCE,acs2017_ny$age_bands,acs2017_ny$SizeofFam)
 ```
 
 
-Next, let's make separate columns in the acs2017 data for each of the three (3) family sizes similar to how there are five (5) columns for education (educ_nohs, educ_hs, etc....). 
+Next, let's make separate columns in the acs2017 data for each of the three (3) family sizes similar to the (5) columns for education (educ_nohs, educ_hs, etc....). 
 
 (Note: we have created an extra "Individual" column so that that can serve as the "dropped variable" when we are running our logit regressions)
-```{r eval=FALSE}
+```{r}
 acs2017_ny$Individual <- ((acs2017_ny$FAMSIZE >= 1) & (acs2017_ny$FAMSIZE <= 1))
 acs2017_ny$SmallFamily <- ((acs2017_ny$FAMSIZE >= 2) & (acs2017_ny$FAMSIZE <= 3))
 acs2017_ny$MediumFamily <- ((acs2017_ny$FAMSIZE >= 4) & (acs2017_ny$FAMSIZE <= 6))
@@ -109,26 +100,23 @@ summary(dat_use1$LargeFamily)
 # Logit: Fam Size ONLY
 Next, let's run the logit regression to see how the family sizes affect whether someone is in the labor force or not. 
 
-Expectation: We are expecting that one of the three (3) variables will drop off as that is necessary so that the variables can be compared to something. Also, we were thinking that the larger the size of the family the less likely the labor participation rate would be because the more people in a household the less likely everyone in the household would need to work, but the counter argument to that is that those with larger families have more mouths to feed and thus would increase their likelihood to be in the labor force. So it is hard to estimate which of the three (3) family sizes will show to have the largest effect on labor participation rates.
+Expectation: We are expecting that one of the three (3) variables will drop off as that is necessary so that the variables can be compared to something. We were thinking that the larger the size of the family the less likely the labor participation rate would be because the more people in a household the less likely everyone in the household would need to work. The counter argument to that is that those with larger families have more mouths to feed and thus would increase their likelihood to be in the labor force. So it is hard to estimate which of the three (3) family sizes will show to have the largest effect on labor participation rates.
 
-Result: So it appears that *small* families have the highest probability of being in the labor force. Next would be *medium* families and last is *large* families which have the lowest probabilities of being in the labor force.
-```{r eval=FALSE}
+Result: it appears that *small* families have the highest probability of being in the labor force. Those in *medium* families have the second highest probability of being in the labor force and those with *large* families have the lowest probabilities of being in the labor force. All of these coefficients used an Individual as the basis for comparison.
+```{r}
 model_logit2 <- glm(LABFORCE ~ SmallFamily + MediumFamily + LargeFamily + Individual,
             family = binomial, data = dat_use1)
 summary(model_logit2)
-
-
 ```
 
 # Logit: All Variables
 Next, let's add in all the other variables to see how that affects our probabilities.
 
-Result: Small families continue to show the highest probability of labor force participation. Followed by medium families. Last is large families. All three family sizes are statistically significant at the 0.05 level.
+Result: Small families continue to show the highest probability of labor force participation. Followed by medium families. Last is large families. All three family sizes are statistically significant at the 0.05 level. We note that adding the variables of AGE and gender increase the probabilities of labor force participation of the three family variables.
 ```{r eval=FALSE}
 model_logit3 <- glm(LABFORCE ~ AGE + female + SmallFamily + MediumFamily + LargeFamily + Individual,
             family = binomial, data = dat_use1)
 summary(model_logit3)
-
 ```
 
 # Logit: All Variables (Interactions)
@@ -138,25 +126,9 @@ Result: The interactions of family size and being female appear to be negative. 
 model_logit4 <- glm(LABFORCE ~ AGE + female + MediumFamily + LargeFamily + SmallFamily + Individual + I(MediumFamily*female) + I(LargeFamily*female) + I(SmallFamily*female) +I(Individual*female)  + I(female*AGE),
             family = binomial, data = dat_use1)
 summary(model_logit4)
-
 ```
 
 How do we do the zero-to-one plots?
-
-```{r eval=FALSE}
-#graveyard <- (( >= 0) & (DEPARTS <= 459))
-#morning <- ((DEPARTS >= 500) & (DEPARTS <=930))
-#daytime <- ((DEPARTS >= 931) & (DEPARTS <=1700))
-#evening <- ((DEPARTS >= 1701) & (DEPARTS <=2359))
-#summary(graveyard)
-#summary(morning)
-#summary(daytime)
-#summary(evening)
-#table(morning)
-```
-
-
-
 
 # For homework, I will ask for predicted values so you can start to figure out how to get those.
 

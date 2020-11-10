@@ -2,8 +2,6 @@ Lab 6
 ================
 Patrick Sinclair, Kieran Yuen
 
-### Factoring LABFORCE and MARST
-
 ### Data Check
 
 As we are using the ACS Data to examine labor force participation, we
@@ -94,9 +92,7 @@ in the labor force are discouraged workers.
     ##        NA Not in LF     in LF 
     ## 0.2431937 0.4986450 0.2581614
 
-\#Creating an age break band
-
-\#Creating our first subset that we will be performing regressions on
+### Creating our first subset that we will be performing regressions on
 
 We would like to use FAMSIZE to see how family size affects a person’s
 probabilities of being in the labor force. We decided to break up the
@@ -113,13 +109,61 @@ and bring in income to survive. But we see there is also a good
 proportion of those who are not in the labor force, which allows us to
 be able to do a regression analysis on the difference.
 
+    ## , ,  = (0,3]
+    ## 
+    ##            
+    ##             (0,15] (15,25] (25,35] (35,45] (45,55] (55,65] (65,100]
+    ##   NA          7079       0       0       0       0       0        0
+    ##   Not in LF      0    6316    2555    2107    3781    8992    26085
+    ##   in LF          0    7851   13867    9575   13754   14889     5346
+    ## 
+    ## , ,  = (3,6]
+    ## 
+    ##            
+    ##             (0,15] (15,25] (25,35] (35,45] (45,55] (55,65] (65,100]
+    ##   NA         21297       0       0       0       0       0        0
+    ##   Not in LF      0    4653    1465    1720    1475    1390     2301
+    ##   in LF          0    4823    6010    8559    7437    2938      485
+    ## 
+    ## , ,  = (6,29]
+    ## 
+    ##            
+    ##             (0,15] (15,25] (25,35] (35,45] (45,55] (55,65] (65,100]
+    ##   NA          3304       0       0       0       0       0        0
+    ##   Not in LF      0     748     251     237     150     181      315
+    ##   in LF          0     582     646     790     556     279       49
+
 Next, let’s make separate columns in the acs2017 data for each of the
-three (3) family sizes similar to how there are five (5) columns for
-education (educ\_nohs, educ\_hs, etc….).
+three (3) family sizes similar to the (5) columns for education
+(educ\_nohs, educ\_hs, etc….).
 
 (Note: we have created an extra “Individual” column so that that can
 serve as the “dropped variable” when we are running our logit
 regressions)
+
+    ##    Mode   FALSE    TRUE 
+    ## logical  157253   39332
+
+    ##    Mode   FALSE    TRUE 
+    ## logical  113117   83468
+
+    ##    Mode   FALSE    TRUE 
+    ## logical  131055   65530
+
+    ##    Mode   FALSE    TRUE 
+    ## logical  188330    8255
+
+    ##    Mode   FALSE    TRUE 
+    ## logical   61205   13730
+
+    ##    Mode   FALSE    TRUE 
+    ## logical   43026   31909
+
+    ##    Mode   FALSE    TRUE 
+    ## logical   48269   26666
+
+    ##    Mode   FALSE    TRUE 
+    ## logical   72305    2630
 
 # Logit: Fam Size ONLY
 
@@ -128,19 +172,47 @@ whether someone is in the labor force or not.
 
 Expectation: We are expecting that one of the three (3) variables will
 drop off as that is necessary so that the variables can be compared to
-something. Also, we were thinking that the larger the size of the family
-the less likely the labor participation rate would be because the more
+something. We were thinking that the larger the size of the family the
+less likely the labor participation rate would be because the more
 people in a household the less likely everyone in the household would
-need to work, but the counter argument to that is that those with larger
+need to work. The counter argument to that is that those with larger
 families have more mouths to feed and thus would increase their
 likelihood to be in the labor force. So it is hard to estimate which of
 the three (3) family sizes will show to have the largest effect on labor
 participation rates.
 
-Result: So it appears that *small* families have the highest probability
-of being in the labor force. Next would be *medium* families and last is
-*large* families which have the lowest probabilities of being in the
-labor force.
+Result: it appears that *small* families have the highest probability of
+being in the labor force. Those in *medium* families have the second
+highest probability of being in the labor force and those with *large*
+families have the lowest probabilities of being in the labor force. All
+of these coefficients used an Individual as the basis for comparison.
+
+    ## 
+    ## Call:
+    ## glm(formula = LABFORCE ~ SmallFamily + MediumFamily + LargeFamily + 
+    ##     Individual, family = binomial, data = dat_use1)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -1.9753   0.5538   0.5538   0.6198   0.8184  
+    ## 
+    ## Coefficients: (1 not defined because of singularities)
+    ##                  Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept)       0.92196    0.01891  48.744  < 2e-16 ***
+    ## SmallFamilyTRUE   0.87555    0.02479  35.313  < 2e-16 ***
+    ## MediumFamilyTRUE  0.63034    0.02486  25.360  < 2e-16 ***
+    ## LargeFamilyTRUE   0.21660    0.04927   4.397  1.1e-05 ***
+    ## IndividualTRUE         NA         NA      NA       NA    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 71408  on 74934  degrees of freedom
+    ## Residual deviance: 70117  on 74931  degrees of freedom
+    ## AIC: 70125
+    ## 
+    ## Number of Fisher Scoring iterations: 4
 
 # Logit: All Variables
 
@@ -150,7 +222,9 @@ probabilities.
 Result: Small families continue to show the highest probability of labor
 force participation. Followed by medium families. Last is large
 families. All three family sizes are statistically significant at the
-0.05 level.
+0.05 level. We note that adding the variables of AGE and gender increase
+the probabilities of labor force participation of the three family
+variables.
 
 # Logit: All Variables (Interactions)
 
