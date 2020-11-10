@@ -11,6 +11,8 @@ attach(acs2017_ny)
 detach()
 ```
 
+
+
 ## Lab 6
 
 Anyway, on to the lab. This week we move to logit and probit models. These are suited for when the dependent y variable takes values of just 0 or 1.
